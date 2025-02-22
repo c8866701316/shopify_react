@@ -3,6 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import Page1 from './Page1';
 import Page2 from './Page2';
+import Client from './Client';
 
 const Dashboard = () => {
   const location = useLocation();
@@ -14,6 +15,7 @@ const Dashboard = () => {
     } else if (location.pathname === '/dashboard/page2') {
       return <Page2 />;
     }
+    
     return null;
   };
 

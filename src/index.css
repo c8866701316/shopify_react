@@ -89,6 +89,7 @@ code {
 .login-button:hover {
   background-color: #0056b3;
 }
+
 .signup-button {
   padding: 0.75rem;
   background-color: #adeb74;
@@ -103,6 +104,7 @@ code {
 .signup-button:hover {
   background-color: #afee5e;
 }
+
 /* Login.css */
 .login-page {
   display: flex;
@@ -115,7 +117,8 @@ code {
 }
 
 .login-container {
-  background-color: rgba(255, 255, 255, 0.9); /* Semi-transparent white */
+  background-color: rgba(255, 255, 255, 0.9);
+  /* Semi-transparent white */
   padding: 2rem;
   border-radius: 8px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
@@ -123,6 +126,7 @@ code {
   max-width: 400px;
   text-align: center;
 }
+
 /* Login.css */
 @media (max-width: 480px) {
   .login-container {
@@ -146,26 +150,34 @@ code {
 
 /* Sidebar.css */
 .sidebar {
-  width: 250px; /* Adjust as needed */
-  background-color: #f0f0f0; /* Light background color */
+  width: 250px;
+  /* Adjust as needed */
+  background-color: #f0f0f0;
+  /* Light background color */
   padding: 20px;
-  position: fixed; /* Or relative, depending on your layout */
+  position: fixed;
+  /* Or relative, depending on your layout */
   left: 0;
-  top: 0; /* Or adjust if you have a header */
+  top: 0;
+  /* Or adjust if you have a header */
   bottom: 0;
-  overflow-y: auto; /* Add scroll if content overflows */
-  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+  overflow-y: auto;
+  /* Add scroll if content overflows */
+  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+  /* Subtle shadow */
 }
 
 .sidebar-content {
   display: flex;
-  flex-direction: column; /* Align items vertically */
+  flex-direction: column;
+  /* Align items vertically */
   height: 100%;
 }
 
 .sidebar-title {
   margin-bottom: 15px;
-  color: #333; /* Darker heading color */
+  color: #333;
+  /* Darker heading color */
 }
 
 .sidebar-nav {
@@ -179,21 +191,27 @@ code {
 }
 
 .sidebar-link {
-  display: block; /* Make links fill the list item width */
+  display: block;
+  /* Make links fill the list item width */
   padding: 10px 15px;
   text-decoration: none;
   color: #333;
-  transition: background-color 0.3s, color 0.3s; /* Smooth transitions */
-  border-radius: 5px; /* Rounded corners (optional) */
+  transition: background-color 0.3s, color 0.3s;
+  /* Smooth transitions */
+  border-radius: 5px;
+  /* Rounded corners (optional) */
 }
 
 .sidebar-link:hover {
-  background-color: #ddd; /* Slightly darker background on hover */
-  color: #007bff; /* Example hover color */
+  background-color: #ddd;
+  /* Slightly darker background on hover */
+  color: #007bff;
+  /* Example hover color */
 }
 
 .sidebar-link.active {
-  background-color: #007bff; /* Highlight the active link */
+  background-color: #007bff;
+  /* Highlight the active link */
   color: white;
 }
 
@@ -201,7 +219,8 @@ code {
 @media (max-width: 768px) {
   .sidebar {
     width: 100%;
-    position: relative; /* Or other suitable behavior for smaller screens */
+    position: relative;
+    /* Or other suitable behavior for smaller screens */
     /* You might want to use a toggle button to show/hide the sidebar on mobile */
   }
 }
@@ -212,22 +231,27 @@ code {
 .offcanvas-body {
   display: flex;
   flex-direction: column;
-  height: 100%; /* Take up full height */
+  height: 100%;
+  /* Take up full height */
 }
 
 /* Push the logout section to the bottom */
 .sidebar-logout {
-  margin-top: auto; /* Push to the bottom */
+  margin-top: auto;
+  /* Push to the bottom */
   padding: 15px;
-  border-top: 1px solid #ddd; /* Add a separator line */
+  border-top: 1px solid #ddd;
+  /* Add a separator line */
 }
 
 /* Style the logout button */
 .sidebar-logout-button {
   width: 100%;
   padding: 10px;
-  background-color: #dc3545; /* Red (Bootstrap-like) */
-  color: white; /* Ensure text is visible */
+  background-color: #dc3545;
+  /* Red (Bootstrap-like) */
+  color: white;
+  /* Ensure text is visible */
   border: none;
   border-radius: 5px;
   cursor: pointer;
@@ -235,16 +259,20 @@ code {
 }
 
 .sidebar-logout-button:hover {
-  background-color: #c82333; /* Darker red on hover */
+  background-color: #c82333;
+  /* Darker red on hover */
 }
 
 /* Optional: Style the button differently when it's focused (keyboard navigation) */
 .sidebar-logout-button:focus {
-  outline: none; /* Remove default outline */
-  box-shadow: 0 0 5px rgba(0, 123, 255, 0.5); /* Add a blue outline */
+  outline: none;
+  /* Remove default outline */
+  box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+  /* Add a blue outline */
 }
 
-.nav-tabs .nav-item.show .nav-link, .nav-tabs .nav-link.active{
+.nav-tabs .nav-item.show .nav-link,
+.nav-tabs .nav-link.active {
   background-color: #c3cad1 !important;
 }
 
@@ -252,11 +280,14 @@ code {
 .nav-tabs .nav-item button {
   font-size: 16px;
   font-weight: bold;
-border-radius: 10px;
+  border-radius: 10px;
 }
+
 .nav-link {
   color: #f0f2f5 !important;
 }
-.nav-link:focus, .nav-link:hover {
+
+.nav-link:focus,
+.nav-link:hover {
   color: #f0f2f5;
 }

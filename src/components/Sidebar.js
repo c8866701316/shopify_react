@@ -22,12 +22,11 @@ const Sidebar = () => {
 
   return (
     <>
-    <div className='p-2'>
-      <Button variant="primary" onClick={handleShow}>
-        Open Menu
-      </Button>
-    </div>
-
+      <div className='p-2'>
+        <Button variant="primary" onClick={handleShow}>
+          Open Menu
+        </Button>
+      </div>
       <Offcanvas show={show} onHide={handleClose}>
         <Offcanvas.Header closeButton>
           <Offcanvas.Title>Menu</Offcanvas.Title>
