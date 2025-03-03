@@ -21,7 +21,7 @@ const Page1 = ({ role }) => {
 
   const handleAddModalClose = () => setShowAddModal(false);
   const handleAddModalShow = () => setShowAddModal(true);
-console.log(latestTrainingData,"latestTrainingData.training.try");
+  // console.log(latestTrainingData, "latestTrainingData.training.try");
 
   // Pagination states
   const [currentPage, setCurrentPage] = useState(0);
@@ -368,50 +368,63 @@ console.log(latestTrainingData,"latestTrainingData.training.try");
       </Modal>
 
       {/* Store Details Modal */}
-      <Modal show={latestModel}>
-      <Table striped bordered hover responsive>
-        <thead>
-          <tr>
-            <th>#</th>
-            <th>Client ID</th>
-            <th>Training ID</th>
-            <th>Created At</th>
-            <th>Status</th>
-            <th>Action</th>
-          </tr>
-        </thead>
-        <tbody>
-          {latestTrainingData ? (
-            <tr>
-              <td>1</td>
-              <td>{latestTrainingData.training?.client_id}</td>
-              <td>{latestTrainingData.training?.training_id}</td>
-              <td>{latestTrainingData.training?.created_at}</td>
-              <td>
-                {latestTrainingData?.training?.try >= 3 && latestTrainingData?.training?.error_message ? (
-                  <span style={{ color: "red" }}>Error: {latestTrainingData?.training?.error_message}</span>
-                ) : (
-                  latestTrainingData?.training?.status
-                )}
-              </td>
-              <td>
-                {latestTrainingData?.training?.try >= 3 && latestTrainingData?.training?.error_message ? (
-                  <Button variant="danger" >
-                    Retry
-                  </Button>
-                ) : null}
-              </td>
-            </tr>
-          ) : (
-            <tr>
-              <td colSpan="6" className="text-center">
-                <p>No training data available</p>
-              </td>
-            </tr>
-          )}
-        </tbody>
-      </Table>
+      <Modal show={latestModel} onHide={() => setLatestModel(false)} size="lg">
+        <Modal.Header closeButton>
+          <div className="d-flex justify-content-between w-100">
+            <Modal.Title>Training Details</Modal.Title>
+          </div>
+        </Modal.Header>
+        <Modal.Body>
+          <Table striped bordered hover responsive>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Client ID</th>
+                <th>Training ID</th>
+                <th>Created At</th>
+                <th>Status</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {latestTrainingData ? ( // Ensure `latestTrainingData` exists
+                <tr>
+                  <td>1</td>
+                  <td>{latestTrainingData.client_id}</td>
+                  <td>{latestTrainingData.training_id}</td>
+                  <td>{new Date(latestTrainingData.created_at).toLocaleString()}</td>
+                  <td>
+                    {latestTrainingData.try >= 3 && latestTrainingData.error_message ? (
+                      <span style={{ color: "red" }}>Error: {latestTrainingData.error_message}</span>
+                    ) : (
+                      latestTrainingData.status
+                    )}
+                  </td>
+                  <td>
+                    {latestTrainingData.try >= 3 && latestTrainingData.error_message ? (
+                      <Button variant="danger">
+                        Retry
+                      </Button>
+                    ) : null}
+                  </td>
+                </tr>
+              ) : (
+                <tr>
+                  <td colSpan="6" className="text-center">
+                    <p>No training data available</p>
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </Table>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => setLatestModel(false)}>
+            Close
+          </Button>
+        </Modal.Footer>
       </Modal>
+
 
     </>
   );
