@@ -7,40 +7,41 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import Moment from "react-moment";
 import ReactPaginate from "react-paginate";
 import { toast } from "react-toastify";
-const Page1 = () => {
+const Page1 = ({ role }) => {
+  if (role === 'admin') {
+    window.history.back()
+  }
   const token = localStorage.getItem('access_token');
   const [showAddModal, setShowAddModal] = useState(false);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [selectedStore, setSelectedStore] = useState(null);
+  const [latestModel, setLatestModel] = useState(false);
   const [storeDetails, setStoreDetails] = useState(null);
-  const [storeId, setStoreId] = useState("");
-  // const [trainingList,setTraininglist] =([])
-  //  console.log("+++",trainingList)
-  const [retryCount, setRetryCount] = useState(0);
-  const [attemptTimes, setAttemptTimes] = useState([]);
-
-
-
+  const [latestTrainingData, setLatestTrainingData] = useState(null);
 
   const handleAddModalClose = () => setShowAddModal(false);
   const handleAddModalShow = () => setShowAddModal(true);
+console.log(latestTrainingData,"latestTrainingData.training.try");
 
   // Pagination states
   const [currentPage, setCurrentPage] = useState(0);
   const storesPerPage = 5; // Number of items per page
 
-
   const handleDetailsModalClose = () => {
-    setShowDetailsModal(false);
+    // setShowDetailsModal(false);
     setSelectedStore(null);
+    setLatestModel(false)
   };
 
   const handleDetailsModalShow = (store) => {
-    setStoreId(store.id)
     setSelectedStore(store);
     setShowDetailsModal(true);
     fetchStoreDetails(store.id)
   };
+
+  // const handlelatestModelClick = (event) => {
+  //   setLatestModel(true)
+  // }
   const [stores, setStores] = useState([]);
   const [loading, setLoading] = useState(false);
   const [newStore, setNewStore] = useState({
@@ -53,14 +54,8 @@ const Page1 = () => {
     status: "active",
   });
 
-  const handleidChange = (event) => {
-    setStoreId(event.target.value);
-  };
-
-
   useEffect(() => {
     fetchStores();
-    fetchStoreDetails();
   }, []);
 
   const fetchStores = async () => {
@@ -79,6 +74,7 @@ const Page1 = () => {
     }
   };
   // Fetch store details by store_id
+
   const fetchStoreDetails = async (storeId) => {
     try {
       const response = await axios.get(`${process.env.REACT_APP_API_URL}/trainlist`, {
@@ -87,17 +83,34 @@ const Page1 = () => {
         },
       });
 
-
       // Find the store by storeId
       const store = response.data.stores.find(s => s.store_id === storeId);
       setStoreDetails(store || null); // Set store details or null if not found
-      // setTraininglist(response.data.stores)
     } catch (error) {
       console.error("Error fetching store details:", error.response ? error.response.data : error.message);
     }
   };
   const handleChange = (e) => {
     setNewStore({ ...newStore, [e.target.name]: e.target.value });
+  };
+
+  const handlelatestModelClick = async (training_id) => {
+    setLatestModel(true)
+    setLoading(true);
+    try {
+      const response = await axios.get(`${process.env.REACT_APP_API_URL}/latest-training/${training_id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      setLatestTrainingData(response.data.training); // Set the fetched data
+      setLatestModel(true); // Open the modal
+    } catch (error) {
+      console.error("Error fetching latest training data:", error.response ? error.response.data : error.message);
+      toast.error("Failed to fetch latest training data.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -116,67 +129,30 @@ const Page1 = () => {
       console.error("Error adding store:", error.response ? error.response.data : error.message);
     }
   };
-  // const addTraining = async () => {
-  //   try {
-  //     setLoading(true);
-  //     setTimeout(() => {
-  //       setLoading(false);
-  //     }, 5000);
-  //     // const storeId = document.getElementById('storeid').value;
-  //     if (!storeId) {
-  //       toast.error('Please enter a Store ID.');
-  //       return;
-  //     }
-  //     const response = await axios.post(`${process.env.REACT_APP_API_URL}/train`, {
-  //       StoreID: storeId, // Sending storeId in request body
-  //     }, {
-  //       headers: {
-  //         Authorization: `Bearer ${token}`,
-  //       }
-  //     });
-  //     if (response.data?.id) {
-  //       // setTrainingId(response.data.id);
-  //       alert(`Training added! ID: ${response.data.id}`);
-  //     }
-  //   } catch (error) {
-  //     console.error('Error adding training:', error);
-  //     alert('Failed to add training.');
-
-  //   }
-  // };
   const addTraining = async () => {
-    if (retryCount >= 3) return; // Stop if retry limit is reached
-
     try {
-      setLoading(true);
-
-      // Store the current attempt time
-      const currentTime = new Date().toLocaleTimeString();
-      setAttemptTimes((prev) => [...prev.slice(-2), currentTime]); // Keep only last 3 attempts
-
+      const storeId = document.getElementById('storeid').value;
       if (!storeId) {
-        toast.error("Please enter a Store ID.");
-        setLoading(false);
+        toast.error('Please enter a Store ID.');
         return;
       }
-
-      const response = await axios.post(
-        `${process.env.REACT_APP_API_URL}/train`,
-        { StoreID: storeId },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-
+      const response = await axios.post(`${process.env.REACT_APP_API_URL}/train`, {
+        store_id: +storeId, // Sending storeId in request body
+      }, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        }
+      });
       if (response.data?.id) {
-        alert(`Training added! ID: ${response.data.id}`);
-        setRetryCount(0); // Reset retry count on success
-        setAttemptTimes([]); // Clear attempt times on success
+        // setTrainingId(response.data.id);
+        // alert(`Training added! ID: ${response.data.id}`);
+        setShowDetailsModal(false);
+        toast.success('Training added successfully!')
       }
     } catch (error) {
-      console.error("Error adding training:", error);
-      // alert(`Failed to add training at ${currentTime}`);
-      setRetryCount((prev) => prev + 1);
-    } finally {
-      setTimeout(() => setLoading(false), 5000); // Ensure loading stops after 5s
+      console.error('Error adding training:', error);
+      toast.error('Failed to add training.'); // Display error message
+      // alert('Failed to add training.');
     }
   };
   // Pagination Logic
@@ -217,12 +193,8 @@ const Page1 = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {/* {console.log("+++",currentStores)} */}
-
                     {currentStores.map((store, index) => (
-
-
-                      <tr key={index} style={{ cursor: "pointer" }}>
+                      <tr key={index} onClick={() => handleDetailsModalShow(store)} style={{ cursor: "pointer" }}>
                         <td>{index + 1}</td>
                         <td>{store.name}</td>
                         <td>{store.api}</td>
@@ -233,8 +205,7 @@ const Page1 = () => {
                         </td>
                         <td>{store.status}</td>
                         <td>
-                          {/* {store.} */}
-                          <Button onClick={() => handleDetailsModalShow(store)}>Training</Button>
+                          <Button>Training</Button>
                         </td>
                       </tr>
                     ))}
@@ -335,71 +306,60 @@ const Page1 = () => {
         </Modal>
       </div>
       {/* Details Modal */}
-      <Modal show={showDetailsModal} onHide={() => setShowDetailsModal(false)}>
+      {/* Details Modal */}
+      <Modal show={showDetailsModal} onHide={() => setShowDetailsModal(false)} size="lg">
         <Modal.Header closeButton>
-          <div className="d-flex justify-content-between w-100">
-            <Modal.Title>Store Details</Modal.Title>
-            {/* <Button>Trainig Now</Button> */}
-          </div>
-          {/* <Modal.Title>Store Details</Modal.Title> */}
+          <Modal.Title>Store Details</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           {storeDetails ? (
             <>
-              <Table striped bordered hover>
+              <Table striped bordered hover responsive >
                 <thead>
                   <tr>
                     <th>#</th>
                     <th>Name</th>
                     <th>Training id</th>
+                    <th>Date</th>
+                    <th>Status</th>
                   </tr>
                 </thead>
                 <tbody>
                   {storeDetails.trainings && storeDetails.trainings.length > 0 ? (
                     storeDetails.trainings.map((training, index) => (
-                      <tr key={index}>
+                      <tr key={index} onClick={() => handlelatestModelClick(training.training_id)} style={{ cursor: 'pointer' }}>
                         <td>{index + 1}</td>
                         <td>{training.client_id}</td>
                         <td>{training.training_id}</td>
+                        <td>{training.created_at}</td>
+                        <td>{training.status}</td>
                       </tr>
                     ))
                   ) : (
-
                     <tr>
-                      <td colSpan="2" className="text-center d-flex justify-content-between flex-column">
-                        <div>
-                          <strong>Last 3 Attempt Times:</strong>
-                          <ul>
-                            {attemptTimes.map((time, index) => (
-                              <li key={index}>{time}</li>
-                            ))}
-                          </ul>
-                        </div>
-
+                      <td colSpan="3" className="text-center">
                         <p>No trainings available</p>
-
-                        <input
-                          type="text"
-                          name="storeid"
-                          id="storeid"
-                          value={storeId}
-                          onChange={handleidChange}
-                        />
-
-                        <Button onClick={addTraining} disabled={loading || retryCount >= 3}>
-                          {loading ? "Loading..." : retryCount >= 3 ? "Retry Limit Reached" : "Add Training"}
-                        </Button>
-
-                        {retryCount >= 3 && (
-                          <Button onClick={() => { setRetryCount(0); setAttemptTimes([]); }}>
-                            Retry
-                          </Button>
-                        )}
                       </td>
                     </tr>
                   )}
                 </tbody>
               </Table>
+
+              {/* Display "Training Now" button and input field if no trainings exist */}
+              {(!storeDetails.trainings || storeDetails.trainings.length === 0) && (
+                <div className="mt-3">
+                  <div className="d-flex align-items-center gap-2">
+                    <input
+                      type="text"
+                      id="storeid"
+                      placeholder="Enter Store ID"
+                      className="form-control"
+                      defaultValue={storeDetails.store_id} // Pre-fill with store ID if available
+                    />
+                    <Button onClick={addTraining}>Training Now</Button>
+                  </div>
+                </div>
+              )}
             </>
           ) : (
             <p>Loading...</p>
@@ -408,42 +368,53 @@ const Page1 = () => {
       </Modal>
 
       {/* Store Details Modal */}
-      {/* {selectedStore && (
-        <Modal show={showDetailsModal} onHide={handleDetailsModalClose}>
-          <Modal.Header closeButton>
-            <div className="d-flex justify-content-between w-100">
-              <Modal.Title>Store Details</Modal.Title>
-              <Button>Trainig Now</Button>
-            </div>
-          </Modal.Header>
-          <Modal.Body>
-            <p><strong>Store Name:</strong> {selectedStore.name}</p>
-            <p><strong>API URL:</strong> {selectedStore.api}</p>
-            <p><strong>Website URL:</strong> {selectedStore.url}</p>
-            <p><strong>API Key:</strong> {selectedStore.api_key}</p>
-            <p><strong>Secret Key:</strong> {selectedStore.sec_key}</p>
-            <p><strong>Access Token:</strong> {selectedStore.acc_token}</p>
-            <p><strong>Status:</strong> {selectedStore.status}</p>
-            <p><strong>Created At:</strong> <Moment format="DD/MM/YYYY">{selectedStore.created_at}</Moment></p>
-          </Modal.Body>
-          <Modal.Footer>
-            <Button variant="secondary" onClick={handleDetailsModalClose}>Close</Button>
-          </Modal.Footer>
-        </Modal>
-      )} */}
+      <Modal show={latestModel}>
+      <Table striped bordered hover responsive>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Client ID</th>
+            <th>Training ID</th>
+            <th>Created At</th>
+            <th>Status</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {latestTrainingData ? (
+            <tr>
+              <td>1</td>
+              <td>{latestTrainingData.training?.client_id}</td>
+              <td>{latestTrainingData.training?.training_id}</td>
+              <td>{latestTrainingData.training?.created_at}</td>
+              <td>
+                {latestTrainingData?.training?.try >= 3 && latestTrainingData?.training?.error_message ? (
+                  <span style={{ color: "red" }}>Error: {latestTrainingData?.training?.error_message}</span>
+                ) : (
+                  latestTrainingData?.training?.status
+                )}
+              </td>
+              <td>
+                {latestTrainingData?.training?.try >= 3 && latestTrainingData?.training?.error_message ? (
+                  <Button variant="danger" >
+                    Retry
+                  </Button>
+                ) : null}
+              </td>
+            </tr>
+          ) : (
+            <tr>
+              <td colSpan="6" className="text-center">
+                <p>No training data available</p>
+              </td>
+            </tr>
+          )}
+        </tbody>
+      </Table>
+      </Modal>
+
     </>
   );
 };
 
 export default Page1;
-
-{/* <tr>
-                      <td colSpan="2" className="text-center d-flex justify-content-between flex-column">
-                        <p>
-                          No trainings available
-                        </p>
-                        
-                        <input type="text" name="storeid" id="storeid" value={storeId}  onChange={handleidChange}  />
-                        <Button onClick={addTraining}>{loading ? "Loading..." : "Add Training"}</Button>
-                      </td>
-                    </tr> */}

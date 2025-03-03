@@ -6,30 +6,72 @@ import { toast } from 'react-toastify';
 // dotenv.config();
 
 
-const Login = () => {
+const Login = ({setToken,setRole,token}) => {
+  if (token) {
+    window.history.back()
+}
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isLogin, setIsLogin] = useState(true);
   const navigate = useNavigate();
 
+  // const handleLogin = async (e) => {
+  //   e.preventDefault(); // Prevent form submission
+  //   try {
+  //     const response = await axios.post(
+  //       `${process.env.REACT_APP_API_URL}/login`,
+  //       { email, password }
+  //     );
+
+  //     if (response) {
+  //       toast.success('Login successful');
+  //       localStorage.setItem('access_token', response.data.access_token);
+  //       navigate('/dashboard/page1'); // Redirect after successful login
+  //     } else {
+  //       toast.error('Invalid credentials');
+  //     }
+  //   } catch (error) {
+  //     toast.error('Login failed: ' + (error.response?.data?.message || 'Server error'));
+  //   }
+  // };
   const handleLogin = async (e) => {
-    e.preventDefault(); // Prevent form submission
+    e.preventDefault();
+    // setLoading(true);
     try {
       const response = await axios.post(
         `${process.env.REACT_APP_API_URL}/login`,
         { email, password }
       );
 
-      if (response) {
+      if (response.data.access_token) {
         toast.success('Login successful');
         localStorage.setItem('access_token', response.data.access_token);
-        navigate('/dashboard/page1'); // Redirect after successful login
+        localStorage.setItem('client_type', response.data.client_type); // Store client type
+        localStorage.setItem('user_id', response.data.user_id); // Store user ID
+        setToken(response.data.access_token)
+        setRole(response.data.client_type)
+        // Redirect based on client type
+        if (response.data.client_type === 'admin') {
+          navigate('/dashboard/client'); // Redirect admin to ClientPage
+        } else if (response.data.client_type === 'client') {
+          navigate('/dashboard/page1'); // Redirect client to Page1
+        } else {
+          navigate('/dashboard/page1'); // Default redirect
+        }
+
+        // Clear input fields
+        setEmail('');
+        setPassword('');
       } else {
         toast.error('Invalid credentials');
       }
     } catch (error) {
+      console.log(error,"errrr");
+      
       toast.error('Login failed: ' + (error.response?.data?.message || 'Server error'));
+    } finally {
+      // setLoading(false);
     }
   };
 
