@@ -111,8 +111,8 @@ const ClientPage = ({ role }) => {
                                 <td>{client.email || 'N/A'}</td>
                                 <td>{client.no_of_stores || 0}</td>
                                 <td>
-                                    <Button variant="info" className="m-1">View</Button>
-                                    <Button variant="warning" className="m-1">Edit</Button>
+                                    {/* <Button variant="info" className="m-1">View</Button>
+                                    <Button variant="warning" className="m-1">Edit</Button> */}
                                     <Button variant="danger" className="m-1" onClick={() => confirmDelete(client.id)}>Delete</Button>
                                 </td>
                             </tr>

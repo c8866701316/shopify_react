@@ -72,6 +72,7 @@ import Offcanvas from 'react-bootstrap/Offcanvas';
 import { confirmAlert } from 'react-confirm-alert'; // For logout confirmation
 import 'react-confirm-alert/src/react-confirm-alert.css'; // Import CSS for confirmation dialog
 import { TiThMenu } from 'react-icons/ti';
+import { toast } from 'react-toastify';
 
 const Sidebar = ({setToken}) => {
   const [show, setShow] = useState(false);
@@ -97,6 +98,7 @@ const Sidebar = ({setToken}) => {
 
   const handleLogout = () => {
     navigate('/login');
+    toast.success('You have been successfully logged out.')
     setToken('');
     localStorage.clear()
   };

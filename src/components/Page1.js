@@ -423,7 +423,9 @@ const Page1 = ({ role }) => {
                       <Button variant="danger" onClick={handleRetry}>
                         Retry
                       </Button>
-                    ) : null}
+                    ) :  (
+                      <span>-</span> 
+                    )}
                   </td>
                 </tr>
               ) : (
