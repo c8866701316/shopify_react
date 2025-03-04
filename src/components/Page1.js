@@ -155,6 +155,24 @@ const Page1 = ({ role }) => {
       // alert('Failed to add training.');
     }
   };
+  const handleRetry = async () => {
+    try {
+      const response = await axios.put(`${process.env.REACT_APP_API_URL}/reset-try/${latestTrainingData.training_id}`,{}, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        }
+      });
+      if (response.status === 200) {
+        // Handle successful retry, maybe refresh the data or show a success message
+        toast.success('Retry successful');
+        setLatestModel(false); // Close the modal
+        setShowDetailsModal(false)
+      }
+    } catch (error) {
+      console.error('Error retrying training:', error);
+      toast.error('Failed to retry training');
+    }
+  };
   // Pagination Logic
   const pageCount = Math.ceil(stores.length / storesPerPage);
   const offset = currentPage * storesPerPage;
@@ -165,7 +183,7 @@ const Page1 = ({ role }) => {
   };
   return (
     <>
-      <div className="d-flex flex-column align-items-center ">
+      <div className="d-flex flex-column align-items-center p-3">
         <div className="w-100">
           <div className="card p-3 w-100">
             <div className="d-flex justify-content-end gap-2">
@@ -354,7 +372,7 @@ const Page1 = ({ role }) => {
                       id="storeid"
                       placeholder="Enter Store ID"
                       className="form-control"
-                      defaultValue={storeDetails.store_id} // Pre-fill with store ID if available
+                      defaultValue={storeDetails.name} // Pre-fill with store ID if available
                     />
                     <Button onClick={addTraining}>Training Now</Button>
                   </div>
@@ -402,7 +420,7 @@ const Page1 = ({ role }) => {
                   </td>
                   <td>
                     {latestTrainingData.try >= 3 && latestTrainingData.error_message ? (
-                      <Button variant="danger">
+                      <Button variant="danger" onClick={handleRetry}>
                         Retry
                       </Button>
                     ) : null}

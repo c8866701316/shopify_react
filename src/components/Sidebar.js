@@ -71,6 +71,7 @@ import Button from 'react-bootstrap/Button';
 import Offcanvas from 'react-bootstrap/Offcanvas';
 import { confirmAlert } from 'react-confirm-alert'; // For logout confirmation
 import 'react-confirm-alert/src/react-confirm-alert.css'; // Import CSS for confirmation dialog
+import { TiThMenu } from 'react-icons/ti';
 
 const Sidebar = ({setToken}) => {
   const [show, setShow] = useState(false);
@@ -132,8 +133,8 @@ const Sidebar = ({setToken}) => {
   return (
     <>
       <div className='p-2'>
-        <Button variant="primary" onClick={handleShow}>
-          Open Menu
+        <Button variant="primary" onClick={handleShow} >
+        <TiThMenu />
         </Button>
       </div>
       <Offcanvas show={show} onHide={handleClose}>
