@@ -6,6 +6,7 @@ import { CiMenuKebab } from "react-icons/ci";
 import Swal from 'sweetalert2';
 import 'react-toastify/dist/ReactToastify.css';
 import ReactPaginate from 'react-paginate';
+import { IoSearchSharp } from 'react-icons/io5';
 
 function PromptPage({ role }) {
   if (role === 'client') {
@@ -176,7 +177,7 @@ function PromptPage({ role }) {
                 boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.1)",
               }}
             >
-              <input
+              {/* <input
                 type="text"
                 className="form-control"
                 placeholder="🔍 Search store or client..."
@@ -189,7 +190,27 @@ function PromptPage({ role }) {
                   border: "1px solid #ccc",
                   fontSize: "14px",
                 }}
-              />
+              /> */}
+               <div className="d-flex flex-column gap-2 position-relative">
+                <div>
+                  <input
+                    type="text"
+                    className="form-control"
+                    placeholder="Search store or client..."
+                    value={filter}
+                    onChange={(e) => setFilter(e.target.value)}
+                    style={{
+                      marginBottom: "10px",
+                      padding: "8px",
+                      borderRadius: "6px",
+                      border: "1px solid #ccc",
+                      fontSize: "14px",
+                      paddingInlineStart:"12%"
+                    }}
+                  />
+                </div>
+                <div className='position-absolute'style={{ top: "15%", left: "3%" }}><IoSearchSharp /></div>
+              </div>
 
               <Dropdown.Item onClick={() => setFilter('')}
                 className="border-bottom fw-bold lh-sm"
