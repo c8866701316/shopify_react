@@ -130,11 +130,15 @@ function PromptPage({ role }) {
       store.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       store.client_name.toLowerCase().includes(searchTerm.toLowerCase())
   );
+  const filteredStoresForPrompt = storeData.filter(
+    (store) =>
+      store.name.toLowerCase().includes(filter.toLowerCase()) ||
+      store.client_name.toLowerCase().includes(filter.toLowerCase())
+  );
 
   const filteredPrompts = prompts.filter((prompt) => {
-    if (!filter) return true; // If no filter is applied, show all prompts
-
-    // Find stores that match the filter and are associated with the current prompt
+    if (!filter) return true;
+     // If no filter is applied, show all prompts
     const matchedStores = storeData.filter(
       (store) =>
         (store.name.toLowerCase().includes(filter.toLowerCase()) ||
@@ -196,8 +200,8 @@ function PromptPage({ role }) {
                 }}>
                 Default
               </Dropdown.Item>
-              {storeData.length > 0 ? (
-                storeData.map((store) => (
+              {filteredStoresForPrompt.length > 0 ? (
+                filteredStoresForPrompt.map((store) => (
                   <Dropdown.Item
                     key={store.id}
                     onClick={() => setFilter(store.name)}
