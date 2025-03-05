@@ -20,7 +20,7 @@ const ClientPage = ({ role }) => {
     const offset = currentPage * itemsPerPage;
     const currentStores = stores.slice(offset, offset + itemsPerPage);
     const [showModal, setShowModal] = useState(false);
-    const [newClient, setNewClient] = useState({ });
+    const [newClient, setNewClient] = useState({});
 
     useEffect(() => {
         fetchStores();
@@ -48,7 +48,7 @@ const ClientPage = ({ role }) => {
                 headers: { Authorization: `Bearer ${token}` },
             });
             toast.success(response.data.message || "Client added successfully");
-            setNewClient({ });
+            setNewClient({});
             fetchStores();
         } catch (error) {
             console.error("Error adding client:", error.response ? error.response.data : error.message);
@@ -68,7 +68,7 @@ const ClientPage = ({ role }) => {
             Swal.fire("Error!", error.response?.data?.message || "Failed to delete client", "error");
         }
     };
-    
+
 
     const confirmDelete = (id) => {
         Swal.fire({
@@ -133,7 +133,10 @@ const ClientPage = ({ role }) => {
             </div>
 
             {/* Add Client Modal */}
-            <Modal show={showModal} onHide={() => setShowModal(false)} centered>
+            <Modal show={showModal} onHide={() => {
+                setShowModal(false)
+                setNewClient({ email: '', password: '' }); // Reset input fields
+            }} centered backdrop="static">
                 <Modal.Header closeButton>
                     <Modal.Title>Add Client</Modal.Title>
                 </Modal.Header>

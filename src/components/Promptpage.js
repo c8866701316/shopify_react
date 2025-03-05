@@ -385,7 +385,10 @@ function PromptPage({ role }) {
             />
           </>
       }
-      <Modal show={showModal} onHide={() => setShowModal(false)}>
+      <Modal show={showModal} onHide={() => {
+    setShowModal(false); 
+    setNewPrompt({ category: '', prompt: '' }); // Reset input fields
+  }}   backdrop="static" centered>
         <Modal.Header closeButton>
           <Modal.Title>Add New Prompt</Modal.Title>
         </Modal.Header>
@@ -403,8 +406,6 @@ function PromptPage({ role }) {
           </Form>
         </Modal.Body>
       </Modal>
-
-
     </div>
   );
 }

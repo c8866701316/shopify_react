@@ -18,6 +18,7 @@ const Page1 = ({ role }) => {
   const [latestModel, setLatestModel] = useState(false);
   const [storeDetails, setStoreDetails] = useState(null);
   const [latestTrainingData, setLatestTrainingData] = useState(null);
+  const [intervalId, setIntervalId] = useState(null);
 
   const handleAddModalClose = () => setShowAddModal(false);
   const handleAddModalShow = () => setShowAddModal(true);
@@ -95,7 +96,50 @@ const Page1 = ({ role }) => {
   };
 
   const handlelatestModelClick = async (training_id) => {
-    setLatestModel(true)
+    // setLatestModel(true)
+    // setLoading(true);
+    // try {
+    //   const response = await axios.get(`${process.env.REACT_APP_API_URL}/latest-training/${training_id}`, {
+    //     headers: {
+    //       Authorization: `Bearer ${token}`,
+    //     },
+    //   });
+    //   setLatestTrainingData(response.data.training); // Set the fetched data
+    //   setLatestModel(true); // Open the modal
+    // } catch (error) {
+    //   console.error("Error fetching latest training data:", error.response ? error.response.data : error.message);
+    //   toast.error("Failed to fetch latest training data.");
+    // } finally {
+    //   setLoading(false);
+    // }
+    setLatestModel(true);
+    fetchLatestTrainingData(training_id);
+
+    // Set up an interval to fetch data every 10 seconds
+    const id = setInterval(() => {
+      fetchLatestTrainingData(training_id);
+    }, 10000);
+    setIntervalId(id);
+  };
+  const handleCloseModal = () => {
+    setLatestModel(false);
+    // Clear the interval when the modal is closed
+    if (intervalId) {
+      clearInterval(intervalId);
+      setIntervalId(null);
+    }
+  };
+
+  useEffect(() => {
+    // Cleanup interval on component unmount
+    return () => {
+      if (intervalId) {
+        clearInterval(intervalId);
+      }
+    };
+  }, [intervalId]);
+
+  const fetchLatestTrainingData = async (training_id) => {
     setLoading(true);
     try {
       const response = await axios.get(`${process.env.REACT_APP_API_URL}/latest-training/${training_id}`, {
@@ -103,8 +147,7 @@ const Page1 = ({ role }) => {
           Authorization: `Bearer ${token}`,
         },
       });
-      setLatestTrainingData(response.data.training); // Set the fetched data
-      setLatestModel(true); // Open the modal
+      setLatestTrainingData(response.data.training);
     } catch (error) {
       console.error("Error fetching latest training data:", error.response ? error.response.data : error.message);
       toast.error("Failed to fetch latest training data.");
@@ -143,7 +186,7 @@ const Page1 = ({ role }) => {
           Authorization: `Bearer ${token}`,
         }
       });
-      if (response.data?.id) {
+      if (response) {
         // setTrainingId(response.data.id);
         // alert(`Training added! ID: ${response.data.id}`);
         setShowDetailsModal(false);
@@ -157,7 +200,7 @@ const Page1 = ({ role }) => {
   };
   const handleRetry = async () => {
     try {
-      const response = await axios.put(`${process.env.REACT_APP_API_URL}/reset-try/${latestTrainingData.training_id}`,{}, {
+      const response = await axios.put(`${process.env.REACT_APP_API_URL}/reset-try/${latestTrainingData.training_id}`, {}, {
         headers: {
           Authorization: `Bearer ${token}`,
         }
@@ -194,7 +237,7 @@ const Page1 = ({ role }) => {
                 Store Add+
               </Button>
             </div>
-            <h2 className="text-center">Store List</h2>
+            {/* <h2 className="text-center">Store List</h2> */}
             {loading ? (
               <p>Loading...</p>
             ) : (
@@ -327,7 +370,7 @@ const Page1 = ({ role }) => {
       {/* Details Modal */}
       <Modal show={showDetailsModal} onHide={() => setShowDetailsModal(false)} size="lg">
         <Modal.Header closeButton>
-          <Modal.Title>Store Details</Modal.Title>
+          <Modal.Title>Training List</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           {storeDetails ? (
@@ -369,10 +412,16 @@ const Page1 = ({ role }) => {
                   <div className="d-flex align-items-center gap-2">
                     <input
                       type="text"
-                      id="storeid"
-                      placeholder="Enter Store ID"
+                      id="storename"
+                      placeholder="Enter Store Name"
                       className="form-control"
-                      defaultValue={storeDetails.name} // Pre-fill with store ID if available
+                      defaultValue={storeDetails.name} // Pre-fill with store name if available
+                      disabled // Disable the input to prevent user modification
+                    />
+                    <input
+                      type="hidden"
+                      id="storeid"
+                      defaultValue={storeDetails.store_id} // Pre-fill with store ID if available
                     />
                     <Button onClick={addTraining}>Training Now</Button>
                   </div>
@@ -386,7 +435,65 @@ const Page1 = ({ role }) => {
       </Modal>
 
       {/* Store Details Modal */}
-      <Modal show={latestModel} onHide={() => setLatestModel(false)} size="lg">
+      <Modal show={latestModel} onHide={handleCloseModal} size="lg">
+        <Modal.Header closeButton>
+          <div className="d-flex justify-content-between w-100">
+            <Modal.Title>Training Details</Modal.Title>
+          </div>
+        </Modal.Header>
+        <Modal.Body>
+          <Table striped bordered hover responsive>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Client ID</th>
+                <th>Training ID</th>
+                <th>Created At</th>
+                <th>Status</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {latestTrainingData ? (
+                <tr>
+                  <td>1</td>
+                  <td>{latestTrainingData.client_id}</td>
+                  <td>{latestTrainingData.training_id}</td>
+                  <td>{new Date(latestTrainingData.created_at).toLocaleString()}</td>
+                  <td>
+                    {latestTrainingData.try >= 3 && latestTrainingData.error_message ? (
+                      <span style={{ color: "red" }}>Error: {latestTrainingData.error_message}</span>
+                    ) : (
+                      latestTrainingData.status
+                    )}
+                  </td>
+                  <td>
+                    {latestTrainingData.try >= 3 && latestTrainingData.error_message ? (
+                      <Button variant="danger" onClick={handleRetry}>
+                        Retry
+                      </Button>
+                    ) : (
+                      <span>-</span>
+                    )}
+                  </td>
+                </tr>
+              ) : (
+                <tr>
+                  <td colSpan="6" className="text-center">
+                    <p>No training data available</p>
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </Table>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleCloseModal}>
+            Close
+          </Button>
+        </Modal.Footer>
+      </Modal>
+      {/* <Modal show={latestModel} onHide={() => setLatestModel(false)} size="lg">
         <Modal.Header closeButton>
           <div className="d-flex justify-content-between w-100">
             <Modal.Title>Training Details</Modal.Title>
@@ -423,8 +530,8 @@ const Page1 = ({ role }) => {
                       <Button variant="danger" onClick={handleRetry}>
                         Retry
                       </Button>
-                    ) :  (
-                      <span>-</span> 
+                    ) : (
+                      <span>-</span>
                     )}
                   </td>
                 </tr>
@@ -443,7 +550,7 @@ const Page1 = ({ role }) => {
             Close
           </Button>
         </Modal.Footer>
-      </Modal>
+      </Modal> */}
 
 
     </>
