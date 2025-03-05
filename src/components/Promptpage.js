@@ -187,6 +187,15 @@ function PromptPage({ role }) {
                 }}
               />
 
+              <Dropdown.Item onClick={() => setFilter('')}
+                className="border-bottom fw-bold lh-sm"
+                style={{
+                  padding: "10px",
+                  borderBottom: "1px solid #ddd",
+                  transition: "background 0.2s",
+                }}>
+                Default
+              </Dropdown.Item>
               {storeData.length > 0 ? (
                 storeData.map((store) => (
                   <Dropdown.Item
