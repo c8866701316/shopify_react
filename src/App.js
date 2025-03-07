@@ -31,8 +31,9 @@ import Page1 from './components/Page1';
 import Page2 from './components/Page2';
 import ClientPage from './components/ClientPage';
 import Promptpage from './components/Promptpage';
-import Econfiguration from './components/e-configuration';
+// import Econfiguration from './components/e-configuration';
 import Sidebar from './components/Sidebar';
+import Keyconfiguration from './components/keyconfiguration';
 
 const App = () => {
 
@@ -51,10 +52,10 @@ const App = () => {
                 {/* <Route path="/login" element={<Login setRole={setRole} setToken={setToken} role={role} />} /> */}
                 <Route path="/dashboard/client" element={<ClientPage role={role} />} />
                 {/* <Route index element={<Navigate to="page1" role={role} />} /> Redirect to Page1 by default */}
-                <Route path="/dashboard/page1" element={<Page1 role={role} />} />
+                <Route path="/dashboard/Stores" element={<Page1 role={role} />} />
                 <Route path="/dashboard/page2" element={<Page2 role={role} />} />
                 <Route path="/dashboard/promt" element={<Promptpage role={role} />} />
-                <Route path="/dashboard/econfiguration" element={<Econfiguration role={role} />} />
+                <Route path="/dashboard/keyconfiguration" element={<Keyconfiguration role={role} />} />
                 {/* <Route path="*" element={<Navigate to="/login" />} /> */}
               </>
             </Routes> :

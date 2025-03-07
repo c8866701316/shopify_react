@@ -192,9 +192,9 @@ const Login = ({ setToken, setRole, token }) => {
         if (response.data.client_type === 'admin') {
           navigate('/dashboard/client'); // Redirect admin to ClientPage
         } else if (response.data.client_type === 'client') {
-          navigate('/dashboard/page1'); // Redirect client to Page1
+          navigate('/dashboard/Stores'); // Redirect client to Page1
         } else {
-          navigate('/dashboard/page1'); // Default redirect
+          navigate('/dashboard/Stores'); // Default redirect
         }
 
         // Clear input fields

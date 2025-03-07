@@ -229,7 +229,7 @@ const Page1 = ({ role }) => {
       <div className="d-flex flex-column align-items-center p-3">
         <div className="w-100">
           <div className="card p-3 w-100">
-            <div className="d-flex justify-content-end gap-2">
+            <div className="d-flex justify-content-end gap-2 p-3">
               {/* <Button variant="primary" onClick={handleDetailsModalShow}>
                 Trainig
               </Button> */}
@@ -260,7 +260,7 @@ const Page1 = ({ role }) => {
                         <td>{store.name}</td>
                         <td>{store.api}</td>
                         <td>
-                          <Moment format="DD/MM/YYYY">
+                          <Moment format="DD/MM/YYYY hh:mm A">
                             {store.created_at}
                           </Moment>
                         </td>
@@ -368,7 +368,7 @@ const Page1 = ({ role }) => {
       </div>
       {/* Details Modal */}
       {/* Details Modal */}
-      <Modal show={showDetailsModal} onHide={() => setShowDetailsModal(false)} size="lg">
+      <Modal show={showDetailsModal} onHide={() => { setShowDetailsModal(false); setStoreDetails({ name: '' }) }} size="lg">
         <Modal.Header closeButton>
           <Modal.Title>Training List</Modal.Title>
         </Modal.Header>
@@ -392,7 +392,11 @@ const Page1 = ({ role }) => {
                         <td>{index + 1}</td>
                         <td>{training.client_id}</td>
                         <td>{training.training_id}</td>
-                        <td>{training.created_at}</td>
+                        <td>
+                          <Moment format="DD/MM/YYYY hh:mm A">
+                            {training.created_at}
+                          </Moment>
+                        </td>
                         <td>{training.status}</td>
                       </tr>
                     ))

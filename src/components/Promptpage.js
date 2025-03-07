@@ -368,8 +368,8 @@ function PromptPage({ role }) {
               </tbody>
             </Table>
             <ReactPaginate
-              previousLabel={'← Previous'}
-              nextLabel={'Next →'}
+              previousLabel={'Previous'}
+              nextLabel={'Next'}
               pageCount={pageCount}
               onPageChange={handlePageChange}
               containerClassName={'pagination justify-content-center'}

@@ -116,13 +116,13 @@ const Sidebar = ({setToken}) => {
       visible: clientType === 'admin', // Only visible for admin
     },
     {
-      path: '/dashboard/econfiguration',
+      path: '/dashboard/keyconfiguration',
       label: 'e-configuration Page',
       visible: clientType === 'admin', // Only visible for admin
     },
     {
-      path: '/dashboard/page1',
-      label: 'Page 1',
+      path: '/dashboard/Stores',
+      label: 'Stores',
       visible: clientType === 'client', // Only visible for client
     },
     {
