@@ -78,12 +78,12 @@ function KeyConfiguration({ role }) {
           ))}
         </tbody>
       </Table>
-      <div>
+      {/* <div>
         <strong>Total Weight: {totalWeight}%</strong>
         {totalWeight !== 100 && (
           <p style={{ color: 'red' }}>Total weight must be 100%</p>
         )}
-      </div>
+      </div> */}
     </div>
   );
 }

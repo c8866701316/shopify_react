@@ -43,9 +43,7 @@ const Page1 = ({ role }) => {
   // const handlelatestModelClick = (event) => {
   //   setLatestModel(true)
   // }
-  const [stores, setStores] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [newStore, setNewStore] = useState({
+  const initialStoreState = {
     name: "",
     api: "",
     url: "",
@@ -53,7 +51,10 @@ const Page1 = ({ role }) => {
     sec_key: "",
     acc_token: "",
     status: "active",
-  });
+  };
+  const [stores, setStores] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [newStore, setNewStore] = useState(initialStoreState);
 
   useEffect(() => {
     fetchStores();
@@ -96,39 +97,38 @@ const Page1 = ({ role }) => {
   };
 
   const handlelatestModelClick = async (training_id) => {
-    // setLatestModel(true)
-    // setLoading(true);
-    // try {
-    //   const response = await axios.get(`${process.env.REACT_APP_API_URL}/latest-training/${training_id}`, {
-    //     headers: {
-    //       Authorization: `Bearer ${token}`,
-    //     },
-    //   });
-    //   setLatestTrainingData(response.data.training); // Set the fetched data
-    //   setLatestModel(true); // Open the modal
-    // } catch (error) {
-    //   console.error("Error fetching latest training data:", error.response ? error.response.data : error.message);
-    //   toast.error("Failed to fetch latest training data.");
-    // } finally {
-    //   setLoading(false);
-    // }
-    setLatestModel(true);
-    fetchLatestTrainingData(training_id);
+    setLatestModel(true); // Open the modal
+    await fetchLatestTrainingData(training_id); // Initial fetch
 
-    // Set up an interval to fetch data every 10 seconds
+    // Clear any existing interval before starting a new one
+    if (intervalId) {
+      clearInterval(intervalId);
+    }
+
+    // Start the interval to fetch data every 10 seconds
     const id = setInterval(() => {
       fetchLatestTrainingData(training_id);
     }, 10000);
     setIntervalId(id);
   };
   const handleCloseModal = () => {
-    setLatestModel(false);
-    // Clear the interval when the modal is closed
+    setLatestModel(false); // Close the modal
+    setLatestTrainingData(null); // Optionally reset the training data
+    // Clear the interval when the modal closes
     if (intervalId) {
       clearInterval(intervalId);
       setIntervalId(null);
     }
   };
+
+  // Cleanup interval on component unmount
+  useEffect(() => {
+    return () => {
+      if (intervalId) {
+        clearInterval(intervalId);
+      }
+    };
+  }, [intervalId]);
 
   useEffect(() => {
     // Cleanup interval on component unmount
@@ -167,6 +167,7 @@ const Page1 = ({ role }) => {
       });
 
       fetchStores(); // Refresh store list
+      setNewStore(initialStoreState); // Clear the form
       setShowAddModal(false);
     } catch (error) {
       console.error("Error adding store:", error.response ? error.response.data : error.message);
@@ -200,7 +201,7 @@ const Page1 = ({ role }) => {
   };
   const handleRetry = async () => {
     try {
-      const response = await axios.put(`${process.env.REACT_APP_API_URL}/reset-try/${latestTrainingData.training_id}`, {}, {
+      const response = await axios.put(`${process.env.REACT_APP_API_URL}/admin/reset-try/${latestTrainingData.training_id}`, {}, {
         headers: {
           Authorization: `Bearer ${token}`,
         }
@@ -315,7 +316,7 @@ const Page1 = ({ role }) => {
         </div>
       </div>
       <div className="d-flex justify-content-center ">
-        <Modal show={showAddModal} onHide={handleAddModalClose}>
+        <Modal show={showAddModal} onHide={handleAddModalClose} backdrop="static">
           <Modal.Header closeButton>
             <Modal.Title>Add Store</Modal.Title>
           </Modal.Header>
@@ -368,7 +369,7 @@ const Page1 = ({ role }) => {
       </div>
       {/* Details Modal */}
       {/* Details Modal */}
-      <Modal show={showDetailsModal} onHide={() => { setShowDetailsModal(false); setStoreDetails({ name: '' }) }} size="lg">
+      <Modal show={showDetailsModal} onHide={() => { setShowDetailsModal(false); setStoreDetails({ name: '' }) }} size="lg" backdrop="static">
         <Modal.Header closeButton>
           <Modal.Title>Training List</Modal.Title>
         </Modal.Header>
@@ -439,7 +440,7 @@ const Page1 = ({ role }) => {
       </Modal>
 
       {/* Store Details Modal */}
-      <Modal show={latestModel} onHide={handleCloseModal} size="lg">
+      <Modal show={latestModel} onHide={handleCloseModal} size="lg" backdrop="static">
         <Modal.Header closeButton>
           <div className="d-flex justify-content-between w-100">
             <Modal.Title>Training Details</Modal.Title>

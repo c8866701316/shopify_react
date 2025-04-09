@@ -117,7 +117,7 @@ const Sidebar = ({setToken}) => {
     },
     {
       path: '/dashboard/keyconfiguration',
-      label: 'e-configuration Page',
+      label: 'Key Configuration Page',
       visible: clientType === 'admin', // Only visible for admin
     },
     {
