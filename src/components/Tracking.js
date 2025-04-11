@@ -249,7 +249,7 @@ const Tracking = () => {
                                 const isFileUpload = status === 'MODEL_FILE_ID_CREATED' && jsonlStatus === 'JSONL_CREATION_SUCCESS';
                                 const isFineTuning = status === 'MODEL_TRAINING_RUNNING' && jsonlStatus === 'JSONL_CREATION_SUCCESS';
                                 const isFineTuneModel = status === 'MODEL_TRAINING_SUCCESS' && jsonlStatus === 'JSONL_CREATION_SUCCESS';
-                                const isFailed = ['MODEL_FILE_ID_FAILED', 'MODEL_TRAINING_FAILED'].includes(status) &&
+                                const isFailed = ['MODEL_FILE_ID_FAILED', 'MODEL_TRAINING_FAILED'].includes(status) ||
                                     ['JSON_FETCH_FAILED', 'JSONL_CREATION_FAILED'].includes(jsonlStatus);
 
                                 const uploadedFilename = item.file_id
@@ -304,7 +304,7 @@ const Tracking = () => {
                                         </td>
                                         <td>{isFineTuning ? item.id : '-'}</td>
                                         <td>{isFineTuneModel ? item.id : '-'}</td>
-                                        <td>{isFailed ? item.id : '-'}</td>
+                                        <td className='text-danger'>{isFailed ? item.error_message : '-'}</td>
                                     </tr>
                                 );
                             })
