@@ -319,3 +319,7 @@ code {
 .pagination li a:hover:not(.active) {
   background-color: #ddd;
 }
+
+.cursor-pointer{
+  cursor: pointer;
+}

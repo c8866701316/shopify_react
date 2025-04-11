@@ -55,6 +55,7 @@ const Page1 = ({ role }) => {
   const [stores, setStores] = useState([]);
   const [loading, setLoading] = useState(false);
   const [newStore, setNewStore] = useState(initialStoreState);
+  const [trainingLoading, setTrainingLoading] = useState(false);
 
   useEffect(() => {
     fetchStores();
@@ -175,6 +176,7 @@ const Page1 = ({ role }) => {
   };
   const addTraining = async () => {
     try {
+      setTrainingLoading(true);
       const storeId = document.getElementById('storeid').value;
       if (!storeId) {
         toast.error('Please enter a Store ID.');
@@ -197,6 +199,8 @@ const Page1 = ({ role }) => {
       console.error('Error adding training:', error);
       toast.error('Failed to add training.'); // Display error message
       // alert('Failed to add training.');
+    } finally {
+      setTrainingLoading(false);
     }
   };
   const handleRetry = async () => {
@@ -374,7 +378,10 @@ const Page1 = ({ role }) => {
           <Modal.Title>Training List</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          {storeDetails ? (
+          {(!storeDetails || trainingLoading) ? (
+            <p className="text-center">Loading...</p>
+
+          ) : (
             <>
               <Table striped bordered hover responsive >
                 <thead>
@@ -433,8 +440,6 @@ const Page1 = ({ role }) => {
                 </div>
               )}
             </>
-          ) : (
-            <p>Loading...</p>
           )}
         </Modal.Body>
       </Modal>
