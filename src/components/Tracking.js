@@ -254,7 +254,7 @@ const Tracking = () => {
 
                                 const uploadedFilename = item.file_id
                                     ? item.file_id
-                                     : null
+                                    : null
 
                                 return (
                                     <tr key={item.id}>
@@ -273,22 +273,22 @@ const Tracking = () => {
 
                                         <td>{isInit ? item.id : '-'}</td>
                                         <td
-                                            className={ isFetchProduct ? 'cursor-pointer text-primary' : ''}
-                                            onClick={() =>  isFetchProduct && openFileInNewTab(uploadedFilename)}
+                                            className={uploadedFilename && uploadedFilename.includes("json") ? 'cursor-pointer text-primary' : ''}
+                                            onClick={() => (uploadedFilename && uploadedFilename.includes("json")) && openFileInNewTab(uploadedFilename)}
                                         >
-                                            {(isFetchProduct ) ? (
+                                            {(uploadedFilename && uploadedFilename.includes("json")) ? (
                                                 <>
                                                     {`${item.id}_trainin.json view`} <i className="bi bi-file-earmark-text ms-1"></i>
                                                 </>
-                                            ) : '-'}
+                                            ) : uploadedFilename ? uploadedFilename : '-'}
                                         </td>
                                         <td
                                             className={item.prompt_text ? 'cursor-pointer text-primary' : ''}
                                             onClick={() => item.prompt_text && showPrompt(item.prompt_text, item.store_name)}
                                         >
-                                            {item.prompt_text && isJsonlDone ? (
+                                            {item.prompt_text ? (
                                                 <>
-                                                    Prompt View <i className="bi bi-chat-left-text ms-1"></i>
+                                                    {`${item.id}_prompt View`}  <i className="bi bi-chat-left-text ms-1"></i>
                                                 </>
                                             ) : '-'}
                                         </td>
@@ -296,15 +296,31 @@ const Tracking = () => {
                                             className={item.file_jsonl ? 'cursor-pointer text-primary' : ''}
                                             onClick={() => item.file_jsonl && openFileInNewTab(item.file_jsonl)}
                                         >
-                                            {isFileUpload ? (
+                                            {item.file_jsonl ? (
                                                 <>
                                                     {`${item.id}_trainin_jsonl.json view`} <i className="bi bi-file-earmark-arrow-up ms-1"></i>
                                                 </>
                                             ) : '-'}
                                         </td>
                                         <td>{isFineTuning ? item.id : '-'}</td>
-                                        <td>{isFineTuneModel ? item.id : '-'}</td>
-                                        <td className='text-danger'>{isFailed ? item.error_message : '-'}</td>
+                                        <td>
+                                            {isFineTuneModel ? (
+                                                <div className="d-flex flex-column">
+                                                    <strong>{item.id}</strong>
+                                                    <small className="text-muted">
+                                                        {item.model_id && item.model_id}
+                                                    </small>
+                                                </div>
+                                            ) : '-'}
+                                        </td>
+                                        <td className='text-danger'>{isFailed ?
+                                         <div className="d-flex flex-column">
+                                         <strong>{item.id}</strong>
+                                         <small>
+                                             {item.error_message}
+                                         </small>
+                                     </div>
+                                         : '-'}</td>
                                     </tr>
                                 );
                             })
