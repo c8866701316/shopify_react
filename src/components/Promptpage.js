@@ -92,29 +92,50 @@ function PromptPage({ role }) {
 
   const handleStoreSelection = async (store, prompt_id) => {
     try {
+      const hasExistingMapping = storeData.some(s => s.id === store.id && s.prompt_id);
+
+      const confirmationMessage = hasExistingMapping
+        ? `You are about to <b>update</b> the prompt for store <b>${store.name}</b> and Client <b>${store.client_name}</b>.`
+        : `You are about to <b>assign</b> this prompt to store <b>${store.name}</b> and Client <b>${store.client_name}</b>.`;
+
+      const confirmButtonText = hasExistingMapping
+        ? 'Yes, update it!'
+        : 'Yes, assign it!';
+
       const result = await Swal.fire({
         title: 'Are you sure?',
-        html: `You are about to assign this prompt to store <b>${store.name}</b> and Client <b>${store.client_name}</b>.`,
+        html: confirmationMessage,
         icon: 'warning',
         showCancelButton: true,
         confirmButtonColor: '#3085d6',
         cancelButtonColor: '#d33',
-        confirmButtonText: 'Yes, assign it!',
+        confirmButtonText: confirmButtonText,
       });
 
       if (result.isConfirmed) {
-        const response = await axios.post(
-          `${process.env.REACT_APP_API_URL}/admin/promptmapping`,
-          { store_id: store.id, prompt_id },
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
+        let response;
+        if (hasExistingMapping) {
+          response = await axios.put(
+            `${process.env.REACT_APP_API_URL}/admin/promptmapping/${store.id}`,
+            { prompt_id },
+            { headers: { Authorization: `Bearer ${token}` } }
+          );
+        } else {
+          response = await axios.post(
+            `${process.env.REACT_APP_API_URL}/admin/promptmapping`,
+            { store_id: store.id, prompt_id },
+            { headers: { Authorization: `Bearer ${token}` } }
+          );
+        }
 
         Swal.fire({
           icon: 'success',
           title: 'Success!',
           text: response.data.message,
         });
-        fetchStoreData();
+
+        await Promise.all([fetchPrompts(), fetchStoreData()]);
+        setSelectedPromptId(null);
       }
     } catch (error) {
       console.error('Error assigning prompt to store:', error);
@@ -139,7 +160,7 @@ function PromptPage({ role }) {
 
   const filteredPrompts = prompts.filter((prompt) => {
     if (!filter) return true;
-     // If no filter is applied, show all prompts
+    // If no filter is applied, show all prompts
     const matchedStores = storeData.filter(
       (store) =>
         (store.name.toLowerCase().includes(filter.toLowerCase()) ||
@@ -164,7 +185,7 @@ function PromptPage({ role }) {
         <h2 className="mb-0">Prompts</h2>
         <div className="d-flex gap-2">
           <Dropdown>
-            <Dropdown.Toggle variant="outline-secondary" id="filter-dropdown">
+            <Dropdown.Toggle variant="outline-secondary" id="filter-dropdown">          
               {filter === '' ? 'Default' : filter}
             </Dropdown.Toggle>
             <Dropdown.Menu
@@ -191,7 +212,7 @@ function PromptPage({ role }) {
                   fontSize: "14px",
                 }}
               /> */}
-               <div className="d-flex flex-column gap-2 position-relative">
+              <div className="d-flex flex-column gap-2 position-relative">
                 <div>
                   <input
                     type="text"
@@ -205,11 +226,11 @@ function PromptPage({ role }) {
                       borderRadius: "6px",
                       border: "1px solid #ccc",
                       fontSize: "14px",
-                      paddingInlineStart:"12%"
+                      paddingInlineStart: "12%"
                     }}
                   />
                 </div>
-                <div className='position-absolute'style={{ top: "15%", left: "3%" }}><IoSearchSharp /></div>
+                <div className='position-absolute' style={{ top: "15%", left: "3%" }}><IoSearchSharp /></div>
               </div>
 
               <Dropdown.Item onClick={() => setFilter('')}
@@ -259,7 +280,7 @@ function PromptPage({ role }) {
             <Table striped bordered hover>
               <thead>
                 <tr>
-                  <th>#</th>
+                  <th>SR No.</th>
                   <th>Category</th>
                   <th>Prompt</th>
                   <th>Created At</th>
@@ -283,7 +304,8 @@ function PromptPage({ role }) {
                         className={isSelected ? 'table-secondary' : 'table-white'}
                         style={{ opacity: isSelected || selectedPromptId === null ? 1 : 0.5 }}
                       >
-                        <td>{index + 1}</td>
+                        {/* <td>{index + 1}</td> */}
+                        <td>{offset + index + 1}</td>
                         <td>{prompt.category}</td>
                         <td>
                           <textarea
@@ -300,7 +322,10 @@ function PromptPage({ role }) {
                             <input
                               type="checkbox"
                               checked={isSelected}
-                              onChange={() => setSelectedPromptId(isSelected ? null : prompt.id)}
+                              onChange={() => { 
+                                setSelectedPromptId(isSelected ? null : prompt.id); 
+                                setSearchTerm(''); 
+                              }}
                             />
                             {isSelected && (
                               <Dropdown>
@@ -386,9 +411,9 @@ function PromptPage({ role }) {
           </>
       }
       <Modal show={showModal} onHide={() => {
-    setShowModal(false); 
-    setNewPrompt({ category: '', prompt: '' }); // Reset input fields
-  }}   backdrop="static" centered>
+        setShowModal(false);
+        setNewPrompt({ category: '', prompt: '' }); // Reset input fields
+      }} backdrop="static" centered>
         <Modal.Header closeButton>
           <Modal.Title>Add New Prompt</Modal.Title>
         </Modal.Header>

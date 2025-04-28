@@ -131,14 +131,14 @@ const Page1 = ({ role }) => {
     };
   }, [intervalId]);
 
-  useEffect(() => {
-    // Cleanup interval on component unmount
-    return () => {
-      if (intervalId) {
-        clearInterval(intervalId);
-      }
-    };
-  }, [intervalId]);
+  // useEffect(() => {
+  //   // Cleanup interval on component unmount
+  //   return () => {
+  //     if (intervalId) {
+  //       clearInterval(intervalId);
+  //     }
+  //   };
+  // }, [intervalId]);
 
   const fetchLatestTrainingData = async (training_id) => {
     setLoading(true);
@@ -261,7 +261,7 @@ const Page1 = ({ role }) => {
                   <tbody>
                     {currentStores.map((store, index) => (
                       <tr key={index} onClick={() => handleDetailsModalShow(store)} style={{ cursor: "pointer" }}>
-                        <td>{index + 1}</td>
+                        <td>{offset + index + 1}</td>
                         <td>{store.name}</td>
                         <td>{store.api}</td>
                         <td>
@@ -410,7 +410,7 @@ const Page1 = ({ role }) => {
                     ))
                   ) : (
                     <tr>
-                      <td colSpan="3" className="text-center">
+                      <td colSpan="5" className="text-center">
                         <p>No trainings available</p>
                       </td>
                     </tr>

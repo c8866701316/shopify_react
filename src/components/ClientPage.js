@@ -106,7 +106,7 @@ const ClientPage = ({ role }) => {
                     <tbody>
                         {currentStores.map((client, index) => (
                             <tr key={index}>
-                                <td>{index + 1}</td>
+                                <td>{offset + index + 1}</td>
                                 <td>{client.created_at || 'N/A'}</td>
                                 <td>{client.email || 'N/A'}</td>
                                 <td>{client.no_of_stores || 0}</td>

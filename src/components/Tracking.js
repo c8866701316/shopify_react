@@ -1,7 +1,8 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
-import { Table, Modal } from 'react-bootstrap';
+import { Table, Modal, Spinner } from 'react-bootstrap';
 import Moment from 'react-moment';
+import ReactPaginate from 'react-paginate';
 
 const Tracking = () => {
     const [fromDate, setFromDate] = useState('');
@@ -16,6 +17,8 @@ const Tracking = () => {
         body: '',
         loading: false
     });
+    const [currentPage, setCurrentPage] = useState(0);
+    const itemsPerPage = 10;
 
     useEffect(() => {
         function formatLocalDateTime(date) {
@@ -32,6 +35,14 @@ const Tracking = () => {
         setFromDate(todayStart);
         setToDate(todayEnd);
     }, []);
+
+    const pageCount = Math.ceil(data.length / itemsPerPage);
+    const offset = currentPage * itemsPerPage;
+    const currentItems = data.slice(offset, offset + itemsPerPage);
+
+    const handlePageChange = ({ selected }) => {
+        setCurrentPage(selected);
+    };
 
     const formatDateTimeForAPI = (dateTimeString) => {
         if (!dateTimeString) return '';
@@ -230,122 +241,154 @@ const Tracking = () => {
             {error && <p className="text-danger text-center">{error}</p>}
 
             <div className="table-responsive" style={{ width: '100%', overflowX: 'auto' }}>
-                <Table striped bordered hover className="mb-0">
-                    <thead>
-                        <tr>
-                            <th>Info</th>
-                            <th>Init</th>
-                            <th>Fetch Product</th>
-                            <th>Jsonl Done</th>
-                            <th>File Upload</th>
-                            <th>Fine Tuning...</th>
-                            <th>Fine Tune Model</th>
-                            <th>Failed</th>
-                        </tr>
-                    </thead>
+                {/* {loading ? (
+                    <div className="text-center my-5">
+                        <Spinner animation="border" />
+                    </div>
+                ) : ( */}
+                    <>
+                        <Table striped bordered hover className="mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Info</th>
+                                    <th>Init</th>
+                                    <th>Fetch Product</th>
+                                    <th>Jsonl Done</th>
+                                    <th>File Upload</th>
+                                    <th>Fine Tuning...</th>
+                                    <th>Try</th>
+                                    <th>Fine Tune Model</th>
+                                    <th>Failed</th>
+                                </tr>
+                            </thead>
 
-                    <tbody>
-                        {data.length > 0 ? (
-                            data.map((item) => {
-                                const status = item.status || '';
-                                const jsonlStatus = item.jsonl_status || '';
+                            <tbody>
+                                {currentItems.length > 0 ? (
+                                    currentItems.map((item) => {
+                                        const status = item.status || '';
+                                        const jsonlStatus = item.jsonl_status || '';
 
-                                const isInit = status === 'init' && (jsonlStatus === 'init' || jsonlStatus === 'PRODUCT_FETCHING');
-                                const isFetchProduct = jsonlStatus === 'JSON_DONE' || jsonlStatus === 'JSONL_CREATION_RUNNING';
-                                const isJsonlDone = status === 'MODEL_FILE_ID_RUNNING' && jsonlStatus === 'JSONL_CREATION_SUCCESS';
-                                const isFileUpload = status === 'MODEL_FILE_ID_CREATED' && jsonlStatus === 'JSONL_CREATION_SUCCESS';
-                                const isFineTuning = status === 'MODEL_TRAINING_RUNNING' && jsonlStatus === 'JSONL_CREATION_SUCCESS';
-                                const isFineTuneModel = status === 'MODEL_TRAINING_SUCCESS' && jsonlStatus === 'JSONL_CREATION_SUCCESS';
-                                const isFailed = ['MODEL_FILE_ID_FAILED', 'MODEL_TRAINING_FAILED'].includes(status) ||
-                                    ['JSON_FETCH_FAILED', 'JSONL_CREATION_FAILED'].includes(jsonlStatus);
+                                        const isInit = status === 'init' && (jsonlStatus === 'init' || jsonlStatus === 'PRODUCT_FETCHING');
+                                        const isFetchProduct = jsonlStatus === 'JSON_DONE' || jsonlStatus === 'JSONL_CREATION_RUNNING';
+                                        const isJsonlDone = status === 'MODEL_FILE_ID_RUNNING' && jsonlStatus === 'JSONL_CREATION_SUCCESS';
+                                        const isFileUpload = status === 'MODEL_FILE_ID_CREATED' && jsonlStatus === 'JSONL_CREATION_SUCCESS';
+                                        const isFineTuning = status === 'MODEL_TRAINING_RUNNING' && jsonlStatus === 'JSONL_CREATION_SUCCESS';
+                                        const isFineTuneModel = status === 'MODEL_TRAINING_SUCCESS' && jsonlStatus === 'JSONL_CREATION_SUCCESS';
+                                        const isFailed = ['MODEL_FILE_ID_FAILED', 'MODEL_TRAINING_FAILED'].includes(status) ||
+                                            ['JSON_FETCH_FAILED', 'JSONL_CREATION_FAILED'].includes(jsonlStatus);
 
-                                const uploadedFilename = item.file_id
-                                    ? item.file_id
-                                    : null
+                                        const uploadedFilename = item.file_id
+                                            ? item.file_id
+                                            : null
 
-                                return (
-                                    <tr key={item.id}>
-                                        <td>
-                                            <div className="d-flex flex-column">
-                                                <strong>{item.store_name || '-'}</strong>
-                                                <small className="text-muted">
-                                                    {item.created_at ? (
-                                                        <Moment format="YYYY-MM-DD HH:mm A">
-                                                            {item.created_at}
-                                                        </Moment>
-                                                    ) : '-'}
-                                                </small>
-                                            </div>
-                                        </td>
+                                        return (
+                                            <tr key={item.id}>
+                                                <td>
+                                                    <div className="d-flex flex-column">
+                                                        <strong>{item.store_name || '-'}</strong>
+                                                        <small className="text-muted">
+                                                            {item.created_at ? (
+                                                                <Moment format="YYYY-MM-DD HH:mm A">
+                                                                    {item.created_at}
+                                                                </Moment>
+                                                            ) : '-'}
+                                                        </small>
+                                                    </div>
+                                                </td>
 
-                                        <td>{isInit ? item.id : '-'}</td>
-                                        <td
-                                        >
-                                            {(uploadedFilename && uploadedFilename.includes("json")) ? (
-                                                <div className={uploadedFilename && uploadedFilename.includes("json") ? 'cursor-pointer text-primary hover-underline' : ''}
-                                                    onClick={() => (uploadedFilename && uploadedFilename.includes("json")) && openFileInNewTab(uploadedFilename)}>
-                                                    {`${item.id}_trainin.json view`} <i className="bi bi-file-earmark-text ms-1"></i>
-                                                </div>
-                                            ) : uploadedFilename ?
-                                                <div className="d-flex flex-column">
-                                                    <strong>{item.id}</strong>
-                                                    <small>
-                                                        {uploadedFilename}
-                                                    </small>
-                                                </div>
-                                                : '-'}
-                                        </td>
-                                        <td
-
-                                        >
-                                            {item.prompt_text ? (
-                                                <div className={item.prompt_text ? 'cursor-pointer text-primary hover-underline' : ''}
-                                                    onClick={() => item.prompt_text && showPrompt(item.prompt_text, item.store_name)}>
-                                                    {`${item.id}_prompt View`}  <i className="bi bi-chat-left-text ms-1"></i>
-                                                </div>
-                                            ) : '-'}
-                                        </td>
-                                        <td>
-                                            {item.file_jsonl ? (
-                                                <div
-                                                    className={item.file_jsonl ? 'cursor-pointer text-primary hover-underline' : ''}
-                                                    onClick={() => item.file_jsonl && openFileInNewTab(item.file_jsonl)}
+                                                <td>{isInit ? item.id : '-'}</td>
+                                                <td
                                                 >
-                                                    {`${item.id}_trainin_jsonl.json view`} <i className="bi bi-file-earmark-arrow-up ms-1"></i>
-                                                </div>
-                                            ) : '-'}
+                                                    {(uploadedFilename && uploadedFilename.includes("json")) ? (
+                                                        <div className={uploadedFilename && uploadedFilename.includes("json") ? 'cursor-pointer text-primary hover-underline' : ''}
+                                                            onClick={() => (uploadedFilename && uploadedFilename.includes("json")) && openFileInNewTab(uploadedFilename)}>
+                                                            {`${item.id}_trainin.json view`} <i className="bi bi-file-earmark-text ms-1"></i>
+                                                        </div>
+                                                    ) : uploadedFilename ?
+                                                        <div className="d-flex flex-column">
+                                                            <strong>{item.id}</strong>
+                                                            <small>
+                                                                {uploadedFilename}
+                                                            </small>
+                                                        </div>
+                                                        : '-'}
+                                                </td>
+                                                <td
+
+                                                >
+                                                    {item.prompt_text ? (
+                                                        <div className={item.prompt_text ? 'cursor-pointer text-primary hover-underline' : ''}
+                                                            onClick={() => item.prompt_text && showPrompt(item.prompt_text, item.store_name)}>
+                                                            {`${item.id}_prompt View`}  <i className="bi bi-chat-left-text ms-1"></i>
+                                                        </div>
+                                                    ) : '-'}
+                                                </td>
+                                                <td>
+                                                    {item.file_jsonl ? (
+                                                        <div
+                                                            className={item.file_jsonl ? 'cursor-pointer text-primary hover-underline' : ''}
+                                                            onClick={() => item.file_jsonl && openFileInNewTab(item.file_jsonl)}
+                                                        >
+                                                            {`${item.id}_trainin_jsonl.json view`} <i className="bi bi-file-earmark-arrow-up ms-1"></i>
+                                                        </div>
+                                                    ) : '-'}
+                                                </td>
+                                                <td>{isFineTuning ? item.id : '-'}</td>
+                                                <td className="fw-bold">
+                                                    {item.try - 1 || '0'}
+                                                </td>
+                                                <td>
+                                                    {isFineTuneModel ? (
+                                                        <div className="d-flex flex-column">
+                                                            <strong>{item.id}</strong>
+                                                            <small className="text-muted">
+                                                                {item.model_id && item.model_id}
+                                                            </small>
+                                                        </div>
+                                                    ) : '-'}
+                                                </td>
+                                                <td className='text-danger'>{isFailed ?
+                                                    <div className="d-flex flex-column">
+                                                        <strong>{item.id}</strong>
+                                                        <small>
+                                                            {item.error_message}
+                                                        </small>
+                                                    </div>
+                                                    : '-'}</td>
+                                            </tr>
+                                        );
+                                    })
+                                ) : (
+                                    <tr>
+                                        <td colSpan="9" className="text-center">
+                                            {loading ? 'Loading...' : 'No data available for selected dates'}
                                         </td>
-                                        <td>{isFineTuning ? item.id : '-'}</td>
-                                        <td>
-                                            {isFineTuneModel ? (
-                                                <div className="d-flex flex-column">
-                                                    <strong>{item.id}</strong>
-                                                    <small className="text-muted">
-                                                        {item.model_id && item.model_id}
-                                                    </small>
-                                                </div>
-                                            ) : '-'}
-                                        </td>
-                                        <td className='text-danger'>{isFailed ?
-                                            <div className="d-flex flex-column">
-                                                <strong>{item.id}</strong>
-                                                <small>
-                                                    {item.error_message}
-                                                </small>
-                                            </div>
-                                            : '-'}</td>
                                     </tr>
-                                );
-                            })
-                        ) : (
-                            <tr>
-                                <td colSpan="8" className="text-center">
-                                    {loading ? 'Loading...' : 'No data available for selected dates'}
-                                </td>
-                            </tr>
+                                )}
+                            </tbody>
+                        </Table>
+                        {data.length > itemsPerPage && (
+                            <ReactPaginate
+                                previousLabel={'Previous'}
+                                nextLabel={'Next'}
+                                pageCount={pageCount}
+                                onPageChange={handlePageChange}
+                                containerClassName={'pagination justify-content-center mt-3'}
+                                pageClassName={'page-item'}
+                                pageLinkClassName={'page-link'}
+                                previousClassName={'page-item'}
+                                previousLinkClassName={'page-link'}
+                                nextClassName={'page-item'}
+                                nextLinkClassName={'page-link'}
+                                breakClassName={'page-item'}
+                                breakLinkClassName={'page-link'}
+                                activeClassName={'active'}
+                                forcePage={currentPage}
+                            />
                         )}
-                    </tbody>
-                </Table>
+                    </>
+                {/* )} */}
+
             </div>
 
             <Modal
