@@ -4,7 +4,10 @@ import { Table, Modal, Spinner } from 'react-bootstrap';
 import Moment from 'react-moment';
 import ReactPaginate from 'react-paginate';
 
-const Tracking = () => {
+const Tracking = ({role}) => {
+    if (role === 'client') {
+        window.history.back();
+      }
     const [fromDate, setFromDate] = useState('');
     const [toDate, setToDate] = useState('');
     const [data, setData] = useState([]);

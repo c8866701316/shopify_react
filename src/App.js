@@ -35,6 +35,7 @@ import Promptpage from './components/Promptpage';
 import Sidebar from './components/Sidebar';
 import Keyconfiguration from './components/keyconfiguration';
 import Tracking from './components/Tracking';
+import Users from './components/Users';
 
 const App = () => {
 
@@ -58,6 +59,7 @@ const App = () => {
                 <Route path="/dashboard/promt" element={<Promptpage role={role} />} />
                 <Route path="/dashboard/keyconfiguration" element={<Keyconfiguration role={role} />} />
                 <Route path="/dashboard/tracking" element={<Tracking role={role} />} />
+                <Route path="/dashboard/users" element={<Users role={role} />} />
                 {/* <Route path="*" element={<Navigate to="/login" />} /> */}
               </>
             </Routes> :
