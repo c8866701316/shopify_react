@@ -49,39 +49,16 @@ const App = () => {
     <div className='d-flex flex-column'>
       {/* <Router>
         {token && <Sidebar setToken={setToken} />}
-        {
-          token ?
-          <Routes>
-              <>
-                <Route path="/dashboard/client" element={<ClientPage role={role} />} />
-                <Route path="/dashboard/Stores" element={<Page1 role={role} />} />
-                <Route path="/dashboard/page2" element={<Page2 role={role} />} />
-                <Route path="/dashboard/promt" element={<Promptpage role={role} />} />
-                <Route path="/dashboard/keyconfiguration" element={<Keyconfiguration role={role} />} />
-                <Route path="/dashboard/tracking" element={<Tracking role={role} />} />
-                <Route path="/dashboard/users" element={<Users role={role} />} />
-                {/* <Route path="*" element={<Navigate to="/login" />} /> */}
-
-              {/* </>
-            </Routes> :
-                <Login setRole={setRole} setToken={setToken} role={role} />
-
-              }
-              <Chatbot position="bottom-right" height={500} width={400} />
-      </Router>  */}
-      <Router>
-        {token && <Sidebar setToken={setToken} />}
         {token ? (
           <>
             <Routes>
               <Route path="/dashboard/client" element={<ClientPage role={role} />} />
-              <Route path="/dashboard/Stores" element={<Page1 role={role} />} />
+              <Route path="/dashboard/stores" element={<Page1 role={role} />} />
               <Route path="/dashboard/page2" element={<Page2 role={role} />} />
-              <Route path="/dashboard/promt" element={<Promptpage role={role} />} />
+              <Route path="/dashboard/prompts" element={<Promptpage role={role} />} />
               <Route path="/dashboard/keyconfiguration" element={<Keyconfiguration role={role} />} />
               <Route path="/dashboard/tracking" element={<Tracking role={role} />} />
               <Route path="/dashboard/users" element={<Users role={role} />} />
-              {/* <Route path="*" element={<Navigate to="/dashboard/client" />} /> */}
             </Routes>
             <Chatbot position="bottom-right" height={500} width={400} />
           </>
@@ -91,7 +68,41 @@ const App = () => {
             <Route path="*" element={<Navigate to="/login" />} />
           </Routes>
         )}
+      </Router> */}
+      <Router>
+        {token && <Sidebar setToken={setToken} />}
+        <Routes>
+          <Route
+            path="/"
+            element={
+              token ? (
+                role === "client" ? (
+                  <Navigate to="/dashboard/stores" />
+                ) : (
+                  <Navigate to="/dashboard/client" />
+                )
+              ) : (
+                <Navigate to="/login" />
+              )
+            }
+          />
+          {token && (
+            <>
+              <Route path="/dashboard/client" element={<ClientPage role={role} />} />
+              <Route path="/dashboard/stores" element={<Page1 role={role} />} />
+              <Route path="/dashboard/page2" element={<Page2 role={role} />} />
+              <Route path="/dashboard/prompts" element={<Promptpage role={role} />} />
+              <Route path="/dashboard/keyconfiguration" element={<Keyconfiguration role={role} />} />
+              <Route path="/dashboard/tracking" element={<Tracking role={role} />} />
+              <Route path="/dashboard/users" element={<Users role={role} />} />
+            </>
+          )}
+          <Route path="/login" element={<Login setRole={setRole} setToken={setToken} role={role} />} />
+          <Route path="*" element={<Navigate to={token ? "/" : "/login"} />} />
+        </Routes>
+        {token && <Chatbot position="bottom-right" height={500} width={400} />}
       </Router>
+
     </div>
   );
 };

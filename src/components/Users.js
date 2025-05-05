@@ -569,7 +569,8 @@ ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend)
 const Users = () => {
   const [users, setUsers] = useState([]);
   const [storeData, setStoreData] = useState([]);
-  const [filter, setFilter] = useState('');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedStore, setSelectedStore] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const token = localStorage.getItem('access_token');
@@ -644,12 +645,12 @@ const Users = () => {
   };
 
   const charts = generateChartData(groupDataByStore());
-  const filteredCharts = filter ? charts.filter((c) => c.store === filter) : charts;
+  const filteredCharts = selectedStore ? charts.filter((c) => c.store === selectedStore) : charts;
 
   const filteredStoresForPrompt = storeData.filter(
     (store) =>
-      store.name.toLowerCase().includes(filter.toLowerCase()) ||
-      store.client_name.toLowerCase().includes(filter.toLowerCase())
+      store.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      store.client_name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   if (loading) {
@@ -684,24 +685,27 @@ const Users = () => {
               <Dropdown className="ms-2">
                 <Dropdown.Toggle variant="outline-primary" id="filter-dropdown" className="d-flex align-items-center">
                   <FaFilter className="me-2" />
-                  {filter === '' ? 'All Stores' : filter}
+                  {selectedStore === '' ? 'All Stores' : selectedStore}
                 </Dropdown.Toggle>
                 <Dropdown.Menu className="p-3" style={{ maxHeight: '400px', overflowY: 'auto', width: '300px' }}>
                   <div className="position-relative mb-3">
                     <Form.Control
                       type="text"
                       placeholder="Search store or client..."
-                      value={filter}
-                      onChange={(e) => setFilter(e.target.value)}
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
                       className="ps-4"
                     />
-                    <IoSearchSharp className="position-absolute top-50 start-0 translate-middle-y ms-3" />
+                    <IoSearchSharp className="position-absolute top-50 start-0 translate-middle-y ms-2" />
                   </div>
                   
                   <Dropdown.Item 
-                    onClick={() => setFilter('')} 
+                    onClick={() => {
+                      setSelectedStore('');
+                      setSearchTerm('');
+                    }}
                     className="fw-bold d-flex align-items-center"
-                    active={filter === ''}
+                    active={selectedStore === ''}
                   >
                     <FaStore className="me-2" />
                     All Stores
@@ -711,17 +715,23 @@ const Users = () => {
                   
                   {filteredStoresForPrompt.length > 0 ? (
                     filteredStoresForPrompt.map((store) => (
-                      <Dropdown.Item 
-                        key={store.id} 
-                        onClick={() => setFilter(store.name)} 
-                        className="fw-bold"
-                        active={filter === store.name}
-                      >
-                        <div>
-                          <div>{store.name}</div>
-                          <small className="text-muted fw-normal">{store.client_name}</small>
-                        </div>
-                      </Dropdown.Item>
+                      <Dropdown.Item
+                      key={store.id}
+                      onClick={() => {
+                        setSelectedStore(store.name);
+                        setSearchTerm('');
+                      }}
+                      className={`fw-bold ${selectedStore === store.name ? 'bg-primary text-white' : ''}`}
+                      active={selectedStore === store.name}
+                    >
+                      <div>
+                        <div className={selectedStore === store.name ? 'text-white' : ''}>{store.name}</div>
+                        <small className={`fw-normal ${selectedStore === store.name ? 'text-white' : 'text-muted'}`}>
+                          {store.client_name}
+                        </small>
+                      </div>
+                    </Dropdown.Item>
+                    
                     ))
                   ) : (
                     <Dropdown.Item disabled className="text-center text-muted py-2">

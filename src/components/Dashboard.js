@@ -9,7 +9,7 @@ const Dashboard = () => {
 
   // Determine which page to render based on the current route
   const renderPage = () => {
-    if (location.pathname === '/dashboard/Stores') {
+    if (location.pathname === '/dashboard/stores') {
       return <Page1 />;
     } else if (location.pathname === '/dashboard/page2') {
       return <Page2 />;

@@ -111,7 +111,7 @@ const Sidebar = ({setToken}) => {
       visible: clientType === 'admin', // Only visible for admin
     },
     {
-      path: '/dashboard/promt',
+      path: '/dashboard/prompts',
       label: 'Prompt Page',
       visible: clientType === 'admin', // Only visible for admin
     },
@@ -131,7 +131,7 @@ const Sidebar = ({setToken}) => {
       visible: clientType === 'admin', // Only visible for admin
     },
     {
-      path: '/dashboard/Stores',
+      path: '/dashboard/stores',
       label: 'Stores',
       visible: clientType === 'client', // Only visible for client
     },
