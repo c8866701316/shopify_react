@@ -35,8 +35,8 @@ import Promptpage from './components/Promptpage';
 import Sidebar from './components/Sidebar';
 import Keyconfiguration from './components/keyconfiguration';
 import Tracking from './components/Tracking';
-import Users from './components/Users';
 import Chatbot from './components/Chatbot';
+import TokenHistory from './components/TokenHistory';
 
 
 const App = () => {
@@ -94,7 +94,7 @@ const App = () => {
               <Route path="/dashboard/prompts" element={<Promptpage role={role} />} />
               <Route path="/dashboard/keyconfiguration" element={<Keyconfiguration role={role} />} />
               <Route path="/dashboard/tracking" element={<Tracking role={role} />} />
-              <Route path="/dashboard/users" element={<Users role={role} />} />
+              <Route path="/dashboard/token-history" element={<TokenHistory role={role} />} />
             </>
           )}
            {!token && (<Route path="/login" element={<Login setRole={setRole} setToken={setToken} role={role} />} />)}
