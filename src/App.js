@@ -97,7 +97,7 @@ const App = () => {
               <Route path="/dashboard/users" element={<Users role={role} />} />
             </>
           )}
-          <Route path="/login" element={<Login setRole={setRole} setToken={setToken} role={role} />} />
+           {!token && (<Route path="/login" element={<Login setRole={setRole} setToken={setToken} role={role} />} />)}
           <Route path="*" element={<Navigate to={token ? "/" : "/login"} />} />
         </Routes>
         {token && <Chatbot position="bottom-right" height={500} width={400} />}
