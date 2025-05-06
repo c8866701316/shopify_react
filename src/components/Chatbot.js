@@ -321,53 +321,115 @@ const Chatbot = ({ position = 'bottom-right', height = 500, width = 400 }) => {
     setMessages((prev) => [...prev, { text, sender }]);
   };
 
- // Handle sending a message
-const handleSend = async () => {
-  if (inputValue.trim()) {
-    addMessage(inputValue, 'user');
-    setInputValue('');
-    setIsLoading(true);
+  // Handle sending a message
+  // const handleSend = async () => {
+  //   if (inputValue.trim()) {
+  //     addMessage(inputValue, 'user');
+  //     setInputValue('');
+  //     setIsLoading(true);
 
-    try {
-      // Prepare the conversation history
-      const conversationHistory = [
-        { role: 'system', content: 'You are a helpful assistant.' },
-        ...messages.map((msg) => ({
-          role: msg.sender === 'user' ? 'user' : 'assistant',
-          content: msg.text,
-        })),
-        { role: 'user', content: inputValue }, // Include the current input
-      ];
+  //     try {
+  //       // Prepare the conversation history
+  //       const conversationHistory = [
+  //         { role: 'system', content: 'You are a helpful assistant.' },
+  //         ...messages.map((msg) => ({
+  //           role: msg.sender === 'user' ? 'user' : 'assistant',
+  //           content: msg.text,
+  //         })),
+  //         { role: 'user', content: inputValue }, // Include the current input
+  //       ];
 
-      const response = await fetch('https://api.openai.com/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${process.env.REACT_APP_OPENAI_API_KEY}`, // Use env variable
-        },
-        body: JSON.stringify({
-          model: 'gpt-3.5-turbo', // or 'gpt-4' if you have access
-          messages: conversationHistory,
-          max_tokens: 150,
-        }),
-      });
+  //       const response = await fetch('https://api.openai.com/v1/chat/completions', {
+  //         method: 'POST',
+  //         headers: {
+  //           'Content-Type': 'application/json',
+  //           'Authorization': `Bearer ${process.env.REACT_APP_OPENAI_API_KEY}`, // Use env variable
+  //         },
+  //         body: JSON.stringify({
+  //           model: 'gpt-3.5-turbo', // or 'gpt-4' if you have access
+  //           messages: conversationHistory,
+  //           max_tokens: 150,
+  //         }),
+  //       });
 
-      if (!response.ok) {
-        throw new Error('Failed to fetch response from OpenAI');
+  //       if (!response.ok) {
+  //         throw new Error('Failed to fetch response from OpenAI');
+  //       }
+
+  //       const data = await response.json();
+  //       const botResponse = data.choices[0].message.content.trim();
+  //       addMessage(botResponse, 'bot');
+  //     } catch (error) {
+  //       console.error('Error fetching ChatGPT response:', error);
+  //       addMessage('Sorry, something went wrong. Please try again.', 'bot');
+  //     } finally {
+  //       setIsLoading(false);
+  //     }
+  //   }
+  // };
+
+  const handleSend = async () => {
+    if (inputValue.trim()) {
+      addMessage(inputValue, 'user');
+      setInputValue('');
+      setIsLoading(true);
+
+      try {
+        // Prepare the conversation history
+        const conversationHistory = [
+          { role: 'system', content: 'You are a helpful assistant.' },
+          ...messages.map((msg) => ({
+            role: msg.sender === 'user' ? 'user' : 'assistant',
+            content: msg.text,
+          })),
+          { role: 'user', content: inputValue }, // Include the current input
+        ];
+
+        const response = await fetch('https://api.openai.com/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${process.env.REACT_APP_OPENAI_API_KEY}`,
+          },
+          body: JSON.stringify({
+            model: 'gpt-3.5-turbo',
+            messages: conversationHistory,
+            max_tokens: 150,
+          }),
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to fetch response from OpenAI');
+        }
+
+        const data = await response.json();
+        const botResponse = data.choices[0].message.content.trim();
+        addMessage(botResponse, 'bot');
+
+        // Send the API response to the backend
+        await fetch(`${process.env.REACT_APP_API_URL}/api/store-chat-completion`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            id: data.id,
+            prompt_tokens: data.usage.prompt_tokens,
+            completion_tokens: data.usage.completion_tokens,
+            total_tokens: data.usage.total_tokens,
+          }),
+        });
+      } catch (error) {
+        console.error('Error fetching ChatGPT response:', error);
+        addMessage('Sorry, something went wrong. Please try again.', 'bot');
+      } finally {
+        setIsLoading(false);
       }
-
-      const data = await response.json();
-      const botResponse = data.choices[0].message.content.trim();
-      addMessage(botResponse, 'bot');
-    } catch (error) {
-      console.error('Error fetching ChatGPT response:', error);
-      addMessage('Sorry, something went wrong. Please try again.', 'bot');
-    } finally {
-      setIsLoading(false);
     }
-  }
-};
-
+  };
+  const clearChat = () => {
+    setMessages([]);
+  };
   // Scroll to bottom of message container
   useEffect(() => {
     if (messageContainerRef.current) {
@@ -434,16 +496,10 @@ const handleSend = async () => {
             </div>
           </div>
           <button
-            style={{
-              background: 'none',
-              border: 'none',
-              color: '#ffffff',
-              cursor: 'pointer',
-              fontSize: '1.5rem',
-              lineHeight: '1',
-            }}
+            onClick={clearChat}
+            className="clear-chat-button"
           >
-            {/* ⋮ Three-dot menu icon */}
+            Clear Chat
           </button>
         </div>
 

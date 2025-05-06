@@ -327,3 +327,19 @@ code {
 .hover-underline:hover {
   text-decoration: underline;
 }
+
+.clear-chat-button {
+  /* background: none; */
+  border: none;
+  color: rgb(255, 255, 255);
+  cursor: pointer;
+  font-size: 0.875rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+  background-color: rgba(125, 170, 230, 0.2);
+}
+
+.clear-chat-button:hover {
+  background-color: #ffffff(255, 255, 255, 0.4); /* Darker background on hover */
+  color: black /* White text on hover */
+}
