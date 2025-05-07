@@ -36,7 +36,7 @@ const TokenHistory = () => {
 
   // Chart pagination
   const [currentPage, setCurrentPage] = useState(0);
-  const chartsPerPage = 4;
+  const chartsPerPage = 6;
 
   useEffect(() => {
     const fetchData = async () => {
@@ -74,17 +74,17 @@ const TokenHistory = () => {
         setUsers(usersData);
         setStoreData(storesRes.data.stores || storesRes.data || []);
         setStructureClients(clientsRes.data.clients || []);
- 
-      // 👇 Auto-select date range from data
-      if (usersData.length > 0) {
-        const dates = usersData.map(u => new Date(u.created_at));
-        const minDate = new Date(Math.min(...dates));
-        const maxDate = new Date(Math.max(...dates));
- 
-        setStartDate(minDate.toISOString().split('T')[0]);
-        setEndDate(maxDate.toISOString().split('T')[0]);
-      }
- 
+
+        // 👇 Auto-select date range from data
+        if (usersData.length > 0) {
+          const dates = usersData.map(u => new Date(u.created_at));
+          const minDate = new Date(Math.min(...dates));
+          const maxDate = new Date(Math.max(...dates));
+
+          setStartDate(minDate.toISOString().split('T')[0]);
+          setEndDate(maxDate.toISOString().split('T')[0]);
+        }
+
       } catch (err) {
         console.error('Error fetching data:', err);
         setError('Failed to load data. Please try again later.');
@@ -129,43 +129,43 @@ const TokenHistory = () => {
 
     return matchStore && matchStructureClient && matchDate;
   });
-   
+
   const groupDataByStore = () => {
     const grouped = {};
-  
+
     filteredUsers.forEach((entry) => {
       const store = entry.store_name || 'Unknown Store';
       const date = getFullDate(entry.created_at);
       const tokens = entry.total_tokens || 0;
-  
+
       if (!grouped[store]) {
         grouped[store] = {
           months: {}, // Store date-wise token data
           totalTokens: 0, // Initialize totalTokens
         };
       }
-  
+
       if (!grouped[store].months[date]) {
         grouped[store].months[date] = 0;
       }
-  
+
       grouped[store].months[date] += tokens;
       grouped[store].totalTokens += tokens; // Accumulate totalTokens
     });
-  
+
     return grouped;
   };
-  
+
   const generateChartData = (data) => {
     return Object.entries(data)
       .map(([store, storeData]) => {
         const sortedEntries = Object.entries(storeData.months).sort(
           ([a], [b]) => new Date(a) - new Date(b)
         );
-  
+
         const labels = sortedEntries.map(([date]) => date);
         const values = sortedEntries.map(([, value]) => value);
-  
+
         return {
           store,
           totalTokens: storeData.totalTokens, // Include totalTokens
@@ -213,12 +213,12 @@ const TokenHistory = () => {
   const handleClearFilter = () => {
     setSelectedStores([]);
     setSelectedStructureClients([]);
-  
+
     if (users.length > 0) {
       const dates = users.map(u => new Date(u.created_at));
       const minDate = new Date(Math.min(...dates));
       const maxDate = new Date(Math.max(...dates));
-  
+
       setStartDate(minDate.toISOString().split('T')[0]);
       setEndDate(maxDate.toISOString().split('T')[0]);
     } else {
@@ -246,7 +246,7 @@ const TokenHistory = () => {
   return (
     <div className="p-4">
       <ToastContainer />
-      <div className="d-flex justify-content-between align-items-center mb-4">
+      <div className="d-sm-flex justify-content-between align-items-center mb-4">
         <h2 className="mb-0">Store-wise Token Usage</h2>
         <div className="d-flex align-items-center gap-2">
           <Button variant="primary" onClick={handleClearFilter}>
@@ -257,28 +257,37 @@ const TokenHistory = () => {
 
       <Card className="mb-4 shadow-sm">
         <Card.Body>
-          <div className="row">
-            <div className="col-md-4 mb-3">
-              <Form.Group>
-                <Form.Label>Date Range</Form.Label>
-                <div className="d-flex gap-2">
-                  <Form.Control
-                    type="date"
-                    value={startDate}
-                    onChange={(e) => setStartDate(e.target.value)}
-                  />
-                  <Form.Control
-                    type="date"
-                    value={endDate}
-                    onChange={(e) => setEndDate(e.target.value)}
-                  />
+          <div className="row g-3">
+            {/* Date Range */}
+            <div className="col-12 col-md-6 col-lg-4">
+              <div className="h-100">
+                <div className="d-flex flex-column flex-sm-row gap-2">
+                  <div className="w-100">
+                    <label className="form-label fw-semibold mb-2">From</label>
+                    <input
+                      type="date"
+                      className="form-control"
+                      value={startDate}
+                      onChange={(e) => setStartDate(e.target.value)}
+                    />
+                  </div>
+                  <div className="w-100">
+                    <label className="form-label fw-semibold mb-2">To</label>
+                    <input
+                      type="date"
+                      className="form-control"
+                      value={endDate}
+                      onChange={(e) => setEndDate(e.target.value)}
+                    />
+                  </div>
                 </div>
-              </Form.Group>
+              </div>
             </div>
 
-            <div className="col-md-4 mb-3">
-              <Form.Group>
-                <Form.Label>Filter by Stores</Form.Label>
+            {/* Store Filter */}
+            <div className="col-12 col-md-6 col-lg-4">
+              <div className="h-100">
+                <label className="form-label fw-semibold mb-2">Filter by Stores</label>
                 <Select
                   isMulti
                   options={storeOptions}
@@ -287,14 +296,17 @@ const TokenHistory = () => {
                   components={animatedComponents}
                   placeholder="Select stores..."
                   closeMenuOnSelect={false}
+                  className="react-select-container"
+                  classNamePrefix="react-select"
                 />
-              </Form.Group>
+              </div>
             </div>
 
+            {/* Structure Clients Filter (Admin only) */}
             {clientType === 'admin' && (
-              <div className="col-md-4">
-                <Form.Group>
-                  <Form.Label>Filter by Structure Clients</Form.Label>
+              <div className="col-12 col-md-6 col-lg-4">
+                <div className="h-100">
+                  <label className="form-label fw-semibold mb-2">Filter by Structure Clients</label>
                   <Select
                     isMulti
                     options={structureClientOptions}
@@ -303,8 +315,10 @@ const TokenHistory = () => {
                     components={animatedComponents}
                     placeholder="Select structure clients..."
                     closeMenuOnSelect={false}
+                    className="react-select-container"
+                    classNamePrefix="react-select"
                   />
-                </Form.Group>
+                </div>
               </div>
             )}
           </div>
@@ -312,11 +326,11 @@ const TokenHistory = () => {
       </Card>
       <Card className="mb-4 shadow-sm">
         <Card.Body className="row text-center">
-          <div className="col-6 col-md-6 mb-3 mb-md-0">
+          <div className="col-12 col-sm-6 mb-3 mb-md-0">
             <h6 className="text-muted mb-1">Total Stores</h6>
             <h5 className="mb-0 fw-semibold">{Object.keys(groupDataByStore()).length}</h5>
           </div>
-          <div className="col-6 col-md-6">
+          <div className="col-12 col-sm-6">
             <h6 className="text-muted mb-1">Total Token Usage</h6>
             <h5 className="mb-0 fw-semibold">{filteredUsers.reduce((sum, user) => sum + user.total_tokens, 0).toLocaleString()}</h5>
           </div>
@@ -332,12 +346,12 @@ const TokenHistory = () => {
         <>
           <div className="row g-4">
             {paginatedCharts.map((chart, idx) => (
-              <div key={idx} className="col-12 col-lg-6">
+              <div key={idx} className="col-12 col-md-6 col-lg-4">
                 <div className="card shadow-sm h-100">
                   <div className="card-header bg-white border-bottom-0">
                     <h5 className="mb-0 text-primary">
                       <FaStore className="me-2" />
-                      {chart.store} - Tokens {chart.totalTokens.toLocaleString()}          
+                      {chart.store} - Tokens {chart.totalTokens.toLocaleString()}
                     </h5>
                   </div>
                   <div className="card-body p-3">
