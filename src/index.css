@@ -340,6 +340,7 @@ code {
 }
 
 .clear-chat-button:hover {
-  background-color: #ffffff(255, 255, 255, 0.4); /* Darker background on hover */
-  color: black /* White text on hover */
+  background-color: white;
+  color: #005BD3;
+  font-weight: 500;
 }

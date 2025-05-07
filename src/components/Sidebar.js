@@ -126,11 +126,6 @@ const Sidebar = ({setToken}) => {
       visible: clientType === 'admin', // Only visible for admin
     },
     {
-      path: '/dashboard/token-history',
-      label: 'Token History',
-      visible: clientType === 'admin' || clientType === 'client', // Only visible for admin
-    },
-    {
       path: '/dashboard/stores',
       label: 'Stores',
       visible: clientType === 'client', // Only visible for client
@@ -139,6 +134,11 @@ const Sidebar = ({setToken}) => {
       path: '/dashboard/page2',
       label: 'Page 2',
       visible: clientType === 'client', // Only visible for client
+    },
+    {
+      path: '/dashboard/token-history',
+      label: 'Token History',
+      visible: clientType === 'admin' || clientType === 'client', // visible for both admin & client
     },
   ];
 
