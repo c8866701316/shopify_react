@@ -70,9 +70,21 @@ const TokenHistory = () => {
           clientsRes = { data: { clients: [] } };
         }
 
-        setUsers(usersRes.data.data || []);
+        const usersData = usersRes.data.data || [];
+        setUsers(usersData);
         setStoreData(storesRes.data.stores || storesRes.data || []);
         setStructureClients(clientsRes.data.clients || []);
+ 
+      // 👇 Auto-select date range from data
+      if (usersData.length > 0) {
+        const dates = usersData.map(u => new Date(u.created_at));
+        const minDate = new Date(Math.min(...dates));
+        const maxDate = new Date(Math.max(...dates));
+ 
+        setStartDate(minDate.toISOString().split('T')[0]);
+        setEndDate(maxDate.toISOString().split('T')[0]);
+      }
+ 
       } catch (err) {
         console.error('Error fetching data:', err);
         setError('Failed to load data. Please try again later.');
@@ -89,65 +101,91 @@ const TokenHistory = () => {
     setCurrentPage(0);
   }, [selectedStores, selectedStructureClients, startDate, endDate]);
 
-  const getMonthFromDate = (dateString) => {
+  const getFullDate = (dateString) => {
     const date = new Date(dateString);
-    return date.toLocaleString('default', { month: 'short' });
+    return date.toLocaleDateString('default', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
+    });
   };
 
   const filteredUsers = users.filter((user) => {
     const created = new Date(user.created_at);
     const matchStore =
-      selectedStores.length === 0 || 
+      selectedStores.length === 0 ||
       (user.store_name && selectedStores.some((store) => store.value === user.store_name)) ||
       (!user.store_name && selectedStores.some((store) => store.value === 'Unknown Store'));
 
     const matchStructureClient =
-      clientType !== 'admin' || // skip this filter for clients
+      clientType !== 'admin' ||
       selectedStructureClients.length === 0 ||
-      (user.structure_client_id && selectedStructureClients.some((sc) => sc.value === user.structure_client_id));
+      (user.structure_client_id &&
+        selectedStructureClients.some((sc) => sc.value === user.structure_client_id));
 
     const matchDate =
       (!startDate || created >= new Date(startDate)) &&
       (!endDate || created <= new Date(endDate));
 
-
     return matchStore && matchStructureClient && matchDate;
   });
-
+   
   const groupDataByStore = () => {
     const grouped = {};
+  
     filteredUsers.forEach((entry) => {
       const store = entry.store_name || 'Unknown Store';
-      const month = getMonthFromDate(entry.created_at);
-      if (!grouped[store]) grouped[store] = {};
-      if (!grouped[store][month]) grouped[store][month] = 0;
-      grouped[store][month] += entry.total_tokens;
+      const date = getFullDate(entry.created_at);
+      const tokens = entry.total_tokens || 0;
+  
+      if (!grouped[store]) {
+        grouped[store] = {
+          months: {}, // Store date-wise token data
+          totalTokens: 0, // Initialize totalTokens
+        };
+      }
+  
+      if (!grouped[store].months[date]) {
+        grouped[store].months[date] = 0;
+      }
+  
+      grouped[store].months[date] += tokens;
+      grouped[store].totalTokens += tokens; // Accumulate totalTokens
     });
+  
     return grouped;
   };
-
+  
   const generateChartData = (data) => {
-    return Object.entries(data).map(([store, monthData]) => {
-      const labels = Object.keys(monthData);
-      const values = Object.values(monthData);
-      return {
-        store,
-        data: {
-          labels,
-          datasets: [
-            {
-              label: 'Total Tokens',
-              data: values,
-              backgroundColor: '#4e73df',
-              borderColor: '#2e59d9',
-              borderWidth: 1,
-              borderRadius: 4,
-              hoverBackgroundColor: '#2e59d9',
-            },
-          ],
-        },
-      };
-    });
+    return Object.entries(data)
+      .map(([store, storeData]) => {
+        const sortedEntries = Object.entries(storeData.months).sort(
+          ([a], [b]) => new Date(a) - new Date(b)
+        );
+  
+        const labels = sortedEntries.map(([date]) => date);
+        const values = sortedEntries.map(([, value]) => value);
+  
+        return {
+          store,
+          totalTokens: storeData.totalTokens, // Include totalTokens
+          data: {
+            labels,
+            datasets: [
+              {
+                label: 'Total Tokens',
+                data: values,
+                backgroundColor: '#4e73df',
+                borderColor: '#2e59d9',
+                borderWidth: 1,
+                borderRadius: 4,
+                hoverBackgroundColor: '#2e59d9',
+              },
+            ],
+          },
+        };
+      })
+      .sort((a, b) => b.totalTokens - a.totalTokens); // Sort by totalTokens (descending)
   };
 
   const storeOptions = [
@@ -172,12 +210,22 @@ const TokenHistory = () => {
     setCurrentPage(selected);
   };
 
-  const handleClearFilter = () =>{
+  const handleClearFilter = () => {
     setSelectedStores([]);
     setSelectedStructureClients([]);
-    setStartDate('');
-    setEndDate('');
-  }
+  
+    if (users.length > 0) {
+      const dates = users.map(u => new Date(u.created_at));
+      const minDate = new Date(Math.min(...dates));
+      const maxDate = new Date(Math.max(...dates));
+  
+      setStartDate(minDate.toISOString().split('T')[0]);
+      setEndDate(maxDate.toISOString().split('T')[0]);
+    } else {
+      setStartDate('');
+      setEndDate('');
+    }
+  };
 
   if (loading) {
     return (
@@ -200,11 +248,11 @@ const TokenHistory = () => {
       <ToastContainer />
       <div className="d-flex justify-content-between align-items-center mb-4">
         <h2 className="mb-0">Store-wise Token Usage</h2>
-        <Button
-         onClick={handleClearFilter}
-       >
-       Clear All Filters
-       </Button>
+        <div className="d-flex align-items-center gap-2">
+          <Button variant="primary" onClick={handleClearFilter}>
+            Clear All Filters
+          </Button>
+        </div>
       </div>
 
       <Card className="mb-4 shadow-sm">
@@ -262,12 +310,23 @@ const TokenHistory = () => {
           </div>
         </Card.Body>
       </Card>
-
+      <Card className="mb-4 shadow-sm">
+        <Card.Body className="row text-center">
+          <div className="col-6 col-md-6 mb-3 mb-md-0">
+            <h6 className="text-muted mb-1">Total Stores</h6>
+            <h5 className="mb-0 fw-semibold">{Object.keys(groupDataByStore()).length}</h5>
+          </div>
+          <div className="col-6 col-md-6">
+            <h6 className="text-muted mb-1">Total Token Usage</h6>
+            <h5 className="mb-0 fw-semibold">{filteredUsers.reduce((sum, user) => sum + user.total_tokens, 0).toLocaleString()}</h5>
+          </div>
+        </Card.Body>
+      </Card>
       {paginatedCharts.length === 0 ? (
         <div className="text-center py-5 bg-light rounded">
           <FaStore size={48} className="text-muted mb-3" />
           <h5 className="text-muted">No chart data available</h5>
-          <p className="text-muted">Try selecting different filters</p>
+          <p className="text-muted">Try selecting different filters or adjusting the search term</p>
         </div>
       ) : (
         <>
@@ -278,7 +337,7 @@ const TokenHistory = () => {
                   <div className="card-header bg-white border-bottom-0">
                     <h5 className="mb-0 text-primary">
                       <FaStore className="me-2" />
-                      {chart.store}
+                      {chart.store} - Tokens {chart.totalTokens.toLocaleString()}          
                     </h5>
                   </div>
                   <div className="card-body p-3">
@@ -304,6 +363,9 @@ const TokenHistory = () => {
                               bodyFont: { size: 12 },
                               padding: 10,
                               displayColors: false,
+                              callbacks: {
+                                label: (context) => `${context.raw.toLocaleString()} Tokens`,
+                              },
                             },
                           },
                           scales: {
@@ -315,6 +377,9 @@ const TokenHistory = () => {
                                 font: { weight: 'bold' },
                               },
                               grid: { drawBorder: false },
+                              ticks: {
+                                callback: (value) => value.toLocaleString(),
+                              },
                             },
                             x: {
                               title: {
