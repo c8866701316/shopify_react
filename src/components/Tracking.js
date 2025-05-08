@@ -250,7 +250,7 @@ const Tracking = ({role}) => {
                     </div>
                 ) : ( */}
                     <>
-                        <Table striped bordered hover className="mb-0">
+                        <Table striped bordered hover responsive className="mb-0">
                             <thead>
                                 <tr>
                                     <th>Info</th>

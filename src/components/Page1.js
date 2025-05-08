@@ -247,7 +247,7 @@ const Page1 = ({ role }) => {
               <p>Loading...</p>
             ) : (
               <>
-                <Table striped bordered hover>
+                <Table striped bordered hover responsive>
                   <thead>
                     <tr>
                       <th>#</th>
@@ -284,7 +284,7 @@ const Page1 = ({ role }) => {
                   breakLabel={"..."}
                   pageCount={pageCount}
                   marginPagesDisplayed={2}
-                  pageRangeDisplayed={5}
+                  pageRangeDisplayed={2}
                   onPageChange={handlePageClick}
                   containerClassName={"pagination justify-content-center"}
                   pageClassName={"page-item"}

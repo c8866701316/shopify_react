@@ -419,6 +419,8 @@ const TokenHistory = () => {
               nextLabel={'Next'}
               pageCount={chartPageCount}
               onPageChange={handlePageChange}
+              marginPagesDisplayed={2} 
+              pageRangeDisplayed={2}
               containerClassName={'pagination justify-content-center'}
               pageClassName={'page-item'}
               pageLinkClassName={'page-link'}

@@ -441,7 +441,7 @@ const Chatbot = ({ position = 'bottom-right', height = 500, width = 400 }) => {
   const chatPopupWidth = window.innerWidth > 768 ? (typeof width === 'number' ? `${width}px` : '400px') : 'calc(100% - 64px)';
 
   return (
-    <div id="chatbot">
+    <div id="chatbot" >
       {/* Chat Popup */}
       <div
         id="chat-popup"

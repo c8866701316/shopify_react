@@ -344,3 +344,10 @@ code {
   color: #005BD3;
   font-weight: 500;
 }
+
+/* Hide page numbers on very small screens */
+@media (max-width: 576px) {
+  .page-item:not(.active):not(:first-child):not(:last-child):not(.previous):not(.next) {
+    display: none;
+  } 
+ }

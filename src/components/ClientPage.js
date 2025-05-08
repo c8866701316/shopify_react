@@ -93,7 +93,7 @@ const ClientPage = ({ role }) => {
                 <Button className='px-4' onClick={() => setShowModal(true)}>+ Add</Button>
             </div>
             <div className="table-responsive">
-                <Table striped bordered hover className="text-center">
+                <Table striped bordered hover className="text-center" responsive>
                     <thead>
                         <tr>
                             <th>Sr No.</th>
