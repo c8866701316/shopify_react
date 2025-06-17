@@ -6,7 +6,7 @@ import { CiMenuKebab } from "react-icons/ci";
 import Swal from 'sweetalert2';
 import 'react-toastify/dist/ReactToastify.css';
 import ReactPaginate from 'react-paginate';
-import { IoSearchSharp } from 'react-icons/io5';
+import { IoSearchSharp, IoStorefront } from 'react-icons/io5';
 
 function PromptPage({ role }) {
   if (role === 'client') {
@@ -185,7 +185,7 @@ function PromptPage({ role }) {
         <h2 className="mb-0">Prompts</h2>
         <div className="d-flex gap-2">
           <Dropdown>
-            <Dropdown.Toggle variant="outline-secondary" id="filter-dropdown">          
+            <Dropdown.Toggle variant="outline-secondary" id="filter-dropdown">
               {filter === '' ? 'Default' : filter}
             </Dropdown.Toggle>
             <Dropdown.Menu
@@ -316,15 +316,34 @@ function PromptPage({ role }) {
                           />
                         </td>
                         <td>{new Date(prompt.created_at).toLocaleString()}</td>
-                        <td>{matchedStores.length > 0 ? matchedStores.join(", ") : "No Store Assigned"}</td>
+                        <td>
+                          {matchedStores.length > 0 ? (
+                            <div className="d-flex flex-wrap gap-2">
+                              {matchedStores.map((storeName, idx) => (
+                                <>
+                                <span
+                                  key={idx}
+                                  className="gap-1 d-inline-flex align-items-center px-2 py-1 rounded text-muted bg-success bg-opacity-25 small fw-medium text-success"
+                                >
+                                <IoStorefront className="text-success" size={15}/>
+                                  {storeName}
+                                </span>
+                                </>
+                              ))}
+                            </div>
+                          ) : (
+                            <span className="text-secondary fst-italic">No stores assigned</span>
+                          )}
+                        </td>
+
                         <td>
                           <div className="d-flex gap-5">
                             <input
                               type="checkbox"
                               checked={isSelected}
-                              onChange={() => { 
-                                setSelectedPromptId(isSelected ? null : prompt.id); 
-                                setSearchTerm(''); 
+                              onChange={() => {
+                                setSelectedPromptId(isSelected ? null : prompt.id);
+                                setSearchTerm('');
                               }}
                             />
                             {isSelected && (

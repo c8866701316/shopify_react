@@ -391,10 +391,11 @@
 // export default Chatbot;
 
 
+import axios from 'axios';
 import React, { useState, useEffect, useRef } from 'react';
 import { BiSupport } from 'react-icons/bi';
 
-const Chatbot = ({ position = 'bottom-right', height = 500, width = 400, storeId = 130 }) => {
+const Chatbot = ({ position = 'bottom-right', height = 500, width = 400, storeId = 151 }) => {
   const [isVisible, setIsVisible] = useState(false);
   const [messages, setMessages] = useState([]);
   const [inputValue, setInputValue] = useState('');
@@ -443,8 +444,8 @@ const Chatbot = ({ position = 'bottom-right', height = 500, width = 400, storeId
         setSessionId(storedSessionId);
       } else {
         try {
-          const response = await fetch('http://192.168.2.50:4000/api/create-session', {
-            method: 'POST',
+          const response = await axios.post(`${process.env.REACT_APP_API_URL}/create-session`, {
+            // method: 'POST',
             headers: { 'Content-Type': 'application/json' },
           });
           if (!response.ok) {
@@ -492,7 +493,7 @@ const Chatbot = ({ position = 'bottom-right', height = 500, width = 400, storeId
       // Add the current message to the history
       conversationHistory.push({ role: 'user', content: currentMessage });
 
-      const response = await fetch(`http://192.168.2.50:4000/api/ask/${storeId}`, {
+      const response = await fetch(`http://192.168.184.160:4000/api/ask/${storeId}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

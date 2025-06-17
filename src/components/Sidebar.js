@@ -135,6 +135,11 @@ const Sidebar = ({setToken}) => {
       label: 'Page 2',
       visible: clientType === 'client', // Only visible for client
     },
+      {
+      path: '/dashboard/payment',
+      label: 'Payment',
+      visible: clientType === 'client', // Only visible for client
+    },
     {
       path: '/dashboard/token-history',
       label: 'Token History',

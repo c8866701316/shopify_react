@@ -351,3 +351,13 @@ code {
     display: none;
   } 
  }
+
+ .react-select__menu {
+  max-height: 300px !important;
+  overflow-y: auto !important;
+}
+
+.react-select__control {
+  max-height: 100px !important;
+  overflow-y: auto !important;
+}

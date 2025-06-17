@@ -37,6 +37,7 @@ import Keyconfiguration from './components/keyconfiguration';
 import Tracking from './components/Tracking';
 import Chatbot from './components/Chatbot';
 import TokenHistory from './components/TokenHistory';
+import Payment from './components/Payment';
 
 
 const App = () => {
@@ -95,6 +96,7 @@ const App = () => {
               <Route path="/dashboard/keyconfiguration" element={<Keyconfiguration role={role} />} />
               <Route path="/dashboard/tracking" element={<Tracking role={role} />} />
               <Route path="/dashboard/token-history" element={<TokenHistory role={role} />} />
+              <Route path="/dashboard/payment" element={<Payment role={role} />} />
             </>
           )}
            {!token && (<Route path="/login" element={<Login setRole={setRole} setToken={setToken} role={role} />} />)}
