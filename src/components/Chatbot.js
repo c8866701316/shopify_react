@@ -435,36 +435,37 @@ const Chatbot = ({ position = 'bottom-right', height = 500, width = 400, storeId
   };
 
   // Fetch or generate session_id on component mount
-  useEffect(() => {
-    const getSessionId = async () => {
-      let storedSessionId = localStorage.getItem('session_id');
-  
-      if (storedSessionId) {
-        setSessionId(storedSessionId);
-      } else {
-        try {
-          const response = await axios.post(`${process.env.REACT_APP_API_URL}/create-session`, {}, {
-            headers: { 'Content-Type': 'application/json' },
-          });
+useEffect(() => {
+  const getSessionId = async () => {
+    let storedSessionId = localStorage.getItem('session_id');
+    if (storedSessionId) {
+      setSessionId(storedSessionId);
+    } else {
+      try {
+        const response = await axios.post(`${process.env.REACT_APP_API_URL}/create-session`, {}, {
+          headers: { 'Content-Type': 'application/json' },
+        });
+        const data = response.data;
+        console.log(data, "data");
 
-          const data = response.data;
-          if (data.session_id) {
-            localStorage.setItem('session_id', data.session_id);
-            setSessionId(data.session_id);
-          } else {
-            console.warn('No session_id in response');
-            addMessage('Failed to initialize session. Please try again.', 'error');
-          }
-        } catch (error) {
-          console.error('Error fetching session_id:', error);
-          addMessage('Unable to connect to session service. Please try again later.', 'error');
+        if (data.session_id) {
+          localStorage.setItem('session_id', data.session_id);
+          setSessionId(data.session_id);
+        } else {
+          console.warn('No session_id in response');
+          addMessage('Failed to initialize session. Please try again.', 'error');
         }
+      } catch (error) {
+        console.error('Error fetching session_id:', error);
+        addMessage('Unable to connect to session service. Please try again later.', 'error');
       }
-    };
-  
-    getSessionId();
-  }, []);
-  
+    }
+  };
+
+  getSessionId();
+}, []);
+
+
   // Handle sending a message
   const handleSend = async () => {
     if (!inputValue.trim() || !sessionId) {

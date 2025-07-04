@@ -25,12 +25,12 @@ const Login = ({ setToken, setRole, token }) => {
         `${process.env.REACT_APP_API_URL}/login`,
         { email, password }
       );
-
       if (response.data.access_token) {
         toast.success('Login successful');
         localStorage.setItem('access_token', response.data.access_token);
         localStorage.setItem('client_type', response.data.client_type);
         localStorage.setItem('user_id', response.data.user_id);
+        localStorage.setItem('user_name',response.data.user_name)
         setToken(response.data.access_token);
         setRole(response.data.client_type);
 
