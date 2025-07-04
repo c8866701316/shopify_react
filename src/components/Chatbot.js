@@ -438,20 +438,16 @@ const Chatbot = ({ position = 'bottom-right', height = 500, width = 400, storeId
   useEffect(() => {
     const getSessionId = async () => {
       let storedSessionId = localStorage.getItem('session_id');
-      console.log(storedSessionId, "Stored_session_id");
-
+  
       if (storedSessionId) {
         setSessionId(storedSessionId);
       } else {
         try {
-          const response = await axios.post(`${process.env.REACT_APP_API_URL}/create-session`, {
-            // method: 'POST',
+          const response = await axios.post(`${process.env.REACT_APP_API_URL}/create-session`, {}, {
             headers: { 'Content-Type': 'application/json' },
           });
-          if (!response.ok) {
-            throw new Error('Failed to create session');
-          }
-          const data = await response.json();
+
+          const data = response.data;
           if (data.session_id) {
             localStorage.setItem('session_id', data.session_id);
             setSessionId(data.session_id);
@@ -465,10 +461,10 @@ const Chatbot = ({ position = 'bottom-right', height = 500, width = 400, storeId
         }
       }
     };
-
+  
     getSessionId();
   }, []);
-
+  
   // Handle sending a message
   const handleSend = async () => {
     if (!inputValue.trim() || !sessionId) {
@@ -493,7 +489,7 @@ const Chatbot = ({ position = 'bottom-right', height = 500, width = 400, storeId
       // Add the current message to the history
       conversationHistory.push({ role: 'user', content: currentMessage });
 
-      const response = await fetch(`http://192.168.184.160:4000/api/ask/${storeId}`, {
+      const response = await fetch(`http://103.39.131.9:8050/api/ask/${storeId}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
